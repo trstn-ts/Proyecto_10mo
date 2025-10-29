@@ -44,14 +44,13 @@ app.post("/api/login", async (req, res) => {
   if (!usuario || !password) {
     return res.status(400).json({ success: false, message: "Faltan datos" });
   }
-  // Falta agregar validacion de que solo administradores se puedan logear
   try {
     const pool = await poolPromise;
     const result = await pool
       .request()
       .input("usuario", sql.VarChar, usuario)
       .input("password", sql.VarChar, password)
-      .query(`SELECT * FROM tbl_usuarios WHERE usuario = @usuario AND password = @password AND id_rol = 1;`);
+      .query(`SELECT * FROM tbl_usuarios WHERE usuario = @usuario AND password = @password AND id_rol = 1 AND activo = 1;`);
       // Es importante que en la base de datos en la tbl_roles el primer rol sea el de administrador (id_rol = 1)
     if (result.recordset.length > 0) {
       res.json({ success: true, message: "Login exitoso", user: result.recordset[0] });
@@ -64,8 +63,34 @@ app.post("/api/login", async (req, res) => {
   }
 });
 
-// Todos los Usuarios sin filtros
+
+// ---- Usuarios ----
+// Todos los Usuarios (activos)
 app.get('/api/usuarios', async (req, res) => {
+  try {
+    const pool = await poolPromise;
+    const result = await pool.request().query(`SELECT U.id_usuario, U.nombre, U.apellido, CONCAT(U.nombre, ' ', U.apellido) AS nombre_usuario, U.correo, U.telefono, U.usuario, U.id_rol, U.id_area, R.nombre_rol, A.nombre_area FROM tbl_usuarios AS U JOIN tbl_roles AS R ON U.id_rol = R.id_rol LEFT JOIN tbl_areas AS A ON U.id_area = A.id_area WHERE U.activo = 1;`);
+    res.json(result.recordset);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error al obtener datos de la base de datos');
+  }
+});
+
+// Todos los Usuarios (inactivos)
+app.get('/api/usuariosInactivos', async (req, res) => {
+  try {
+    const pool = await poolPromise;
+    const result = await pool.request().query(`SELECT U.id_usuario, CONCAT (U.nombre, ' ', U.apellido) AS nombre_usuario, U.correo, U.telefono, R.nombre_rol, A.nombre_area FROM tbl_usuarios AS U JOIN tbl_roles AS R ON U.id_rol = R.id_rol LEFT JOIN tbl_areas AS A ON U.id_area = A.id_area WHERE U.activo = 0;`);
+    res.json(result.recordset);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error al obtener datos de la base de datos');
+  }
+});
+
+// Todos los Usuarios (activos e inactivos)
+app.get('/api/usuariosTodos', async (req, res) => {
   try {
     const pool = await poolPromise;
     const result = await pool.request().query(`SELECT U.id_usuario, CONCAT (U.nombre, ' ', U.apellido) AS nombre_usuario, U.correo, U.telefono, R.nombre_rol, A.nombre_area FROM tbl_usuarios AS U JOIN tbl_roles AS R ON U.id_rol = R.id_rol LEFT JOIN tbl_areas AS A ON U.id_area = A.id_area;`);
@@ -82,7 +107,7 @@ app.get("/api/tecnicos", async (req, res) => {
     const pool = await poolPromise;
     const result = await pool
       .request()
-      .query(`SELECT U.id_usuario, CONCAT (U.nombre, ' ', U.apellido) AS nombre_usuario, R.nombre_rol FROM tbl_usuarios AS U JOIN tbl_roles AS R ON U.id_rol = R.id_rol LEFT JOIN tbl_areas AS A ON U.id_area = A.id_area WHERE R.nombre_rol = 'Técnico';`);
+      .query(`SELECT U.id_usuario, CONCAT (U.nombre, ' ', U.apellido) AS nombre_usuario, R.nombre_rol FROM tbl_usuarios AS U JOIN tbl_roles AS R ON U.id_rol = R.id_rol LEFT JOIN tbl_areas AS A ON U.id_area = A.id_area WHERE R.nombre_rol = 'Técnico' AND U.activo = 1;`);
 
     res.json(result.recordset);
   } catch (err) {
@@ -91,6 +116,155 @@ app.get("/api/tecnicos", async (req, res) => {
   }
 });
 
+// Nuevo usuario
+app.post('/api/usuariosNuevo', async (req, res) => {
+  const { nombre, apellido, correo, telefono, usuario, password, id_rol, id_area } = req.body;
+
+  if (!nombre || !apellido || !correo || !usuario || !password || !id_rol) {
+    return res.status(400).json({ success: false, message: "Faltan datos obligatorios" });
+  }
+
+  try {
+    const pool = await poolPromise;
+
+    const ultimo = await pool.request().query(`SELECT ISNULL(MAX(id_usuario), 0) AS ultimoId FROM tbl_usuarios`);
+    const nuevoId = ultimo.recordset[0].ultimoId + 1;
+    
+    await pool.request()
+      .input("id_usuario", sql.Int, nuevoId)
+      .input("nombre", sql.VarChar(100), nombre)
+      .input("apellido", sql.VarChar(100), apellido)
+      .input("correo", sql.VarChar(120), correo)
+      .input("telefono", sql.VarChar(20), telefono || null)
+      .input("usuario", sql.VarChar(120), usuario)
+      .input("password", sql.VarChar(255), password) // Por ahora lo ingresa sin cifrado
+      .input("id_rol", sql.Int, id_rol)
+      .input("id_area", sql.Int, id_area || null)
+      .query(`INSERT INTO tbl_usuarios (id_usuario, nombre, apellido, correo, telefono, usuario, password, id_rol, id_area, activo)
+              VALUES (@id_usuario, @nombre, @apellido, @correo, @telefono, @usuario, @password, @id_rol, @id_area, 1)`);
+
+    res.status(201).json({ success: true, message: "Usuario creado correctamente", id_usuario: nuevoId });
+
+  } catch (err) {
+    console.error("Error al crear usuario:", err);
+    res.status(500).json({ success: false, message: "Error interno del servidor" });
+  }
+});
+
+// Eliminar usuario (solo cambiamos el activo a 0)
+app.delete('/api/usuarios/:id_usuario', async (req, res) => {
+  const { id_usuario } = req.params;
+  try {
+    const pool = await poolPromise;
+
+    const check = await pool.request()
+      .input("id_usuario", sql.Int, id_usuario)
+      .query(`SELECT * FROM tbl_usuarios WHERE id_usuario = @id_usuario AND activo = 1`);
+
+    if (check.recordset.length === 0) {
+      return res.status(404).json({ success: false, message: "Usuario no encontrado o ya inactivo" });
+    }
+    await pool.request()
+      .input("id_usuario", sql.Int, id_usuario)
+      .query(`UPDATE tbl_usuarios SET activo = 0 WHERE id_usuario = @id_usuario`);
+
+    res.json({ success: true, message: "Usuario eliminado correctamente" });
+
+  } catch (err) {
+    console.error("Error al eliminar usuario:", err);
+    res.status(500).json({ success: false, message: "Error interno del servidor" });
+  }
+});
+
+// Actualizar usuario
+app.put('/api/usuariosActualizar/:id_usuario', async (req, res) => {
+  const { id_usuario } = req.params;
+  const { nombre, apellido, correo, telefono, usuario, password, id_rol, id_area } = req.body;
+
+  if (!nombre || !apellido || !correo || !usuario || !id_rol) {
+    return res.status(400).json({ success: false, message: "Faltan datos obligatorios" });
+  }
+
+  try {
+    const pool = await poolPromise;
+    
+    const check = await pool.request()
+      .input("id_usuario", sql.Int, id_usuario)
+      .query(`SELECT COUNT(*) AS total FROM tbl_usuarios WHERE id_usuario = @id_usuario`);
+
+    if (check.recordset[0].total === 0) {
+      return res.status(404).json({ success: false, message: "Usuario no encontrado" });
+    }
+    
+    let query = `
+      UPDATE tbl_usuarios
+      SET nombre = @nombre,
+          apellido = @apellido,
+          correo = @correo,
+          telefono = @telefono,
+          usuario = @usuario,
+          id_rol = @id_rol,
+          id_area = @id_area
+    `;
+
+    if (password && password.trim() !== "") {
+      query += `, password = @password`;
+    }
+
+    query += ` WHERE id_usuario = @id_usuario`;
+
+    const request = pool.request()
+      .input("id_usuario", sql.Int, id_usuario)
+      .input("nombre", sql.VarChar(100), nombre)
+      .input("apellido", sql.VarChar(100), apellido)
+      .input("correo", sql.VarChar(120), correo)
+      .input("telefono", sql.VarChar(20), telefono || null)
+      .input("usuario", sql.VarChar(120), usuario)
+      .input("id_rol", sql.Int, id_rol)
+      .input("id_area", sql.Int, id_area || null);
+
+    if (password && password.trim() !== "") {
+      request.input("password", sql.VarChar(255), password); 
+    }
+
+    await request.query(query);
+
+    res.json({ success: true, message: "Usuario actualizado correctamente" });
+
+  } catch (err) {
+    console.error("Error al actualizar usuario:", err);
+    res.status(500).json({ success: false, message: "Error interno del servidor" });
+  }
+});
+
+// Activar usuario inactivo
+app.put('/api/usuariosActivar/:id_usuario', async (req, res) => {
+  const { id_usuario } = req.params;
+
+  try {
+    const pool = await poolPromise;
+
+    const check = await pool.request()
+      .input('id_usuario', sql.Int, id_usuario)
+      .query('SELECT COUNT(*) AS total FROM tbl_usuarios WHERE id_usuario = @id_usuario');
+
+    if (check.recordset[0].total === 0) {
+      return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
+    }
+
+    await pool.request()
+      .input('id_usuario', sql.Int, id_usuario)
+      .query('UPDATE tbl_usuarios SET activo = 1 WHERE id_usuario = @id_usuario');
+
+    res.json({ success: true, message: 'Usuario activado correctamente' });
+  } catch (err) {
+    console.error('Error al activar usuario:', err);
+    res.status(500).json({ success: false, message: 'Error interno del servidor' });
+  }
+});
+
+
+// ---- Tickets ----
 // Todos los Tickets sin filtros
 app.get('/api/tickets', async (req, res) => {
   try {
@@ -138,6 +312,8 @@ app.put("/api/asignarTicket", async (req, res) => {
   }
 });
 
+
+// ---- Roles ----
 // Roles
 app.get('/api/roles', async (req, res) => {
   try {
@@ -226,6 +402,8 @@ app.delete('/api/roles/:id_rol', async (req, res) => {
   }
 });
 
+
+// ---- Areas ----
 // Areas
 app.get('/api/areas', async (req, res) => {
   try {

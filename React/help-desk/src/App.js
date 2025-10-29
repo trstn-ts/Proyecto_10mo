@@ -9,6 +9,7 @@ import TicketsSinAsignar from "./components/modulos/tickets/TicketsSinAsignar";
 import Usuarios from "./components/modulos/usuarios/Usuarios";
 import Roles from "./components/modulos/roles/Roles";
 import Areas from "./components/modulos/areas/Areas";
+import UsuariosInactivos from "./components/modulos/usuarios/UsuariosInactivos";
 
 function App() {
   const [autenticado, setAutenticado] = useState(false);
@@ -21,6 +22,7 @@ function App() {
         <Route path="/" element={autenticado ? <Layout /> : <Navigate to="/login" />}>
           <Route path="inicio" element={<Inicio />} />
           <Route path="usuarios" element={<Usuarios />} />
+          <Route path="usuarios-inactivos" element={<UsuariosInactivos />} />
           <Route path="tickets" element={<Tickets />} />
           <Route path="tickets-sin-asignar" element={<TicketsSinAsignar />} />
           <Route path="roles" element={<Roles />} />

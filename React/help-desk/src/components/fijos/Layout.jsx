@@ -19,13 +19,12 @@ function Layout() {
             </li>
             <li>
               <Link to="/usuarios">Usuarios</Link>
+              <Link to="/usuarios-inactivos">Usuarios Inactivos</Link>
             </li>
             <li>
               <Link to="/tickets">Tickets</Link>
-            </li>   
-            <li>
               <Link to="/tickets-sin-asignar">Tickets Sin Asignar</Link>
-            </li>   
+            </li>              
             <li>
               <Link to="/roles">Roles</Link>
             </li>                         
