@@ -226,6 +226,94 @@ app.delete('/api/roles/:id_rol', async (req, res) => {
   }
 });
 
+// Areas
+app.get('/api/areas', async (req, res) => {
+  try {
+    const pool = await poolPromise;
+    const result = await pool.request().query(`SELECT * FROM tbl_areas;`);
+    res.json(result.recordset);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error al obtener datos de la base de datos');
+  }
+});
+
+// Usuarios por Area
+app.get('/api/areasUsuarios', async (req, res) => {
+  const { id_area } = req.query;
+  if (!id_area) {
+    return res.status(400).json({ success: false, message: "Falta el id del area" });
+  }
+  try {
+    const pool = await poolPromise;
+    const result = await pool.request()
+      .input("id_area", sql.Int, id_area)
+      .query(`SELECT A.id_area, A.nombre_area, U.id_usuario, CONCAT(U.nombre, ' ', U.apellido) AS nombre_usuario FROM tbl_areas A LEFT JOIN tbl_usuarios U ON A.id_area = U.id_area WHERE A.id_area = @id_area;`);
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("Error al obtener usuarios por area:", err);
+    res.status(500).send('Error al obtener datos de la base de datos');
+  }
+});
+
+// Nuevo Area
+app.post('/api/areaNuevo', async (req, res) => {
+  const { nombre_area, descripcion } = req.body;
+  if (!nombre_area) {
+    return res.status(400).json({ success: false, message: "El nombre del area es obligatorio" });
+  }
+  try {
+    const pool = await poolPromise;
+    const ultimo = await pool.request().query(`SELECT ISNULL(MAX(id_area), 0) AS ultimoId FROM tbl_areas`);
+    const nuevoId = ultimo.recordset[0].ultimoId + 1;
+
+    await pool.request()
+      .input("id_area", sql.Int, nuevoId)
+      .input("nombre_area", sql.VarChar(100), nombre_area)
+      .input("descripcion", sql.VarChar(255), descripcion || "")
+      .query(`INSERT INTO tbl_areas (id_area, nombre_area, descripcion_area) VALUES (@id_area, @nombre_area, @descripcion);`);
+    res.status(201).json({
+      success: true,
+      message: "Area creada correctamente",
+      id_area: nuevoId
+    });
+  } catch (err) {
+    console.error("Error al crear area:", err);
+    res.status(500).json({ success: false, message: "Error en el servidor" });
+  }
+});
+
+// Eliminar area
+app.delete('/api/areas/:id_area', async (req, res) => {
+  const { id_area } = req.params;
+  try {
+    const pool = await poolPromise;
+    const check = await pool.request().input("id_area", sql.Int, id_area).query(`SELECT COUNT(*) AS total FROM tbl_usuarios WHERE id_area = @id_area`);
+    const total = check.recordset[0].total;
+    if (total > 0) {
+      return res.status(400).json({
+        success: false,
+        message: `No se puede eliminar el area porque hay ${total} usuario(s) asignado(s) a él.`,
+      });
+    }
+    await pool.request()
+      .input("id_area", sql.Int, id_area)
+      .query(`DELETE FROM tbl_areas WHERE id_area = @id_area`);
+
+    res.json({
+      success: true,
+      message: "Area eliminada correctamente",
+    });
+
+  } catch (err) {
+    console.error("Error al eliminar area:", err);
+    res.status(500).json({
+      success: false,
+      message: "Error al eliminar el area en el servidor",
+    });
+  }
+});
+
 app.listen(port, () => {
     console.log(`API corriendo en http://localhost:${port}`);
 });

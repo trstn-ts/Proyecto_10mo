@@ -8,6 +8,7 @@ import Tickets from "./components/modulos/tickets/Tickets";
 import TicketsSinAsignar from "./components/modulos/tickets/TicketsSinAsignar";
 import Usuarios from "./components/modulos/usuarios/Usuarios";
 import Roles from "./components/modulos/roles/Roles";
+import Areas from "./components/modulos/areas/Areas";
 
 function App() {
   const [autenticado, setAutenticado] = useState(false);
@@ -23,6 +24,7 @@ function App() {
           <Route path="tickets" element={<Tickets />} />
           <Route path="tickets-sin-asignar" element={<TicketsSinAsignar />} />
           <Route path="roles" element={<Roles />} />
+          <Route path="areas" element={<Areas />} />
         </Route>
       </Routes>
     </Router>

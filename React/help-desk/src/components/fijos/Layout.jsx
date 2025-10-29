@@ -28,7 +28,10 @@ function Layout() {
             </li>   
             <li>
               <Link to="/roles">Roles</Link>
-            </li>           
+            </li>                         
+            <li>
+              <Link to="/areas">Areas</Link>
+            </li>
           </ul>
         </nav>
       </aside>    
