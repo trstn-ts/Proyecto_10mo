@@ -25,7 +25,10 @@ function Layout() {
             </li>   
             <li>
               <Link to="/tickets-sin-asignar">Tickets Sin Asignar</Link>
-            </li>            
+            </li>   
+            <li>
+              <Link to="/roles">Roles</Link>
+            </li>           
           </ul>
         </nav>
       </aside>    

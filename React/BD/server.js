@@ -44,15 +44,15 @@ app.post("/api/login", async (req, res) => {
   if (!usuario || !password) {
     return res.status(400).json({ success: false, message: "Faltan datos" });
   }
-
+  // Falta agregar validacion de que solo administradores se puedan logear
   try {
     const pool = await poolPromise;
     const result = await pool
       .request()
       .input("usuario", sql.VarChar, usuario)
       .input("password", sql.VarChar, password)
-      .query("SELECT * FROM tbl_usuarios WHERE usuario = @usuario AND password = @password");
-
+      .query(`SELECT * FROM tbl_usuarios WHERE usuario = @usuario AND password = @password AND id_rol = 1;`);
+      // Es importante que en la base de datos en la tbl_roles el primer rol sea el de administrador (id_rol = 1)
     if (result.recordset.length > 0) {
       res.json({ success: true, message: "Login exitoso", user: result.recordset[0] });
     } else {
@@ -76,6 +76,21 @@ app.get('/api/usuarios', async (req, res) => {
   }
 });
 
+// Tecnicos para asignar tickets
+app.get("/api/tecnicos", async (req, res) => {
+  try {
+    const pool = await poolPromise;
+    const result = await pool
+      .request()
+      .query(`SELECT U.id_usuario, CONCAT (U.nombre, ' ', U.apellido) AS nombre_usuario, R.nombre_rol FROM tbl_usuarios AS U JOIN tbl_roles AS R ON U.id_rol = R.id_rol LEFT JOIN tbl_areas AS A ON U.id_area = A.id_area WHERE R.nombre_rol = 'Técnico';`);
+
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("Error al obtener técnicos:", err);
+    res.status(500).json({ message: "Error al obtener técnicos" });
+  }
+});
+
 // Todos los Tickets sin filtros
 app.get('/api/tickets', async (req, res) => {
   try {
@@ -88,15 +103,126 @@ app.get('/api/tickets', async (req, res) => {
   }
 });
 
-// Todos los Tickets sin filtros
+// Tickets sin asignar a tecnico y prioridad
 app.get('/api/ticketsSinAsignar', async (req, res) => {
   try {
     const pool = await poolPromise;
-    const result = await pool.request().query(`SELECT T.id_ticket, T.titulo, T.prioridad, T.estado, T.fecha_creacion, T.fecha_cierre, CONCAT(U.nombre, ' ', U.apellido) AS nombre_usuario,  CONCAT(TE.nombre, ' ', TE.apellido) AS nombre_tecnico FROM tbl_tickets T INNER JOIN tbl_usuarios U ON T.id_usuario = U.id_usuario LEFT JOIN tbl_usuarios TE ON T.id_tecnico = TE.id_usuario WHERE T.id_tecnico IS NULL AND T.prioridad IS NULL AND T.estado = 'En proceso';`);
+    const result = await pool.request().query(`SELECT T.id_ticket, T.titulo, T.prioridad, T.estado, T.fecha_creacion, T.fecha_cierre, CONCAT(U.nombre, ' ', U.apellido) AS nombre_usuario,  CONCAT(TE.nombre, ' ', TE.apellido) AS nombre_tecnico, T.descripcion_problema FROM tbl_tickets T INNER JOIN tbl_usuarios U ON T.id_usuario = U.id_usuario LEFT JOIN tbl_usuarios TE ON T.id_tecnico = TE.id_usuario WHERE T.id_tecnico IS NULL AND T.prioridad IS NULL AND T.estado = 'En proceso';`);
     res.json(result.recordset);
   } catch (err) {
     console.error(err);
     res.status(500).send('Error al obtener datos de la base de datos');
+  }
+});
+
+// Para el archivo TicketsSinAsignar.jsx. Asignar ticket a tecnico y prioridad
+app.put("/api/asignarTicket", async (req, res) => {
+  const { id_ticket, id_tecnico, prioridad } = req.body;
+
+  if (!id_ticket || !id_tecnico || !prioridad) {
+    return res.status(400).json({ success: false, message: "Faltan datos requeridos" });
+  }
+
+  try {
+    const pool = await poolPromise;
+    await pool
+      .request()
+      .input("id_ticket", sql.Int, id_ticket)
+      .input("id_tecnico", sql.Int, id_tecnico)
+      .input("prioridad", sql.VarChar, prioridad)      
+      .query(`UPDATE tbl_tickets SET id_tecnico = @id_tecnico, prioridad = @prioridad WHERE id_ticket = @id_ticket`);
+    res.json({ success: true, message: "Ticket asignado correctamente" });
+  } catch (err) {
+    console.error("Error al asignar ticket:", err);
+    res.status(500).json({ success: false, message: "Error al asignar ticket" });
+  }
+});
+
+// Roles
+app.get('/api/roles', async (req, res) => {
+  try {
+    const pool = await poolPromise;
+    const result = await pool.request().query(`SELECT * FROM tbl_roles;`);
+    res.json(result.recordset);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error al obtener datos de la base de datos');
+  }
+});
+
+// Usuarios por Roles
+app.get('/api/rolesUsuarios', async (req, res) => {
+  const { id_rol } = req.query;
+  if (!id_rol) {
+    return res.status(400).json({ success: false, message: "Falta el id del rol" });
+  }
+  try {
+    const pool = await poolPromise;
+    const result = await pool.request()
+      .input("id_rol", sql.Int, id_rol)
+      .query(`SELECT R.id_rol, R.nombre_rol, U.id_usuario, CONCAT(U.nombre, ' ', U.apellido) AS nombre_usuario FROM tbl_roles R LEFT JOIN tbl_usuarios U ON R.id_rol = U.id_rol WHERE R.id_rol = @id_rol;`);
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("Error al obtener usuarios por rol:", err);
+    res.status(500).send('Error al obtener datos de la base de datos');
+  }
+});
+
+// Nuevo Rol
+app.post('/api/rolesNuevo', async (req, res) => {
+  const { nombre_rol, descripcion } = req.body;
+  if (!nombre_rol) {
+    return res.status(400).json({ success: false, message: "El nombre del rol es obligatorio" });
+  }
+  try {
+    const pool = await poolPromise;    
+    const ultimo = await pool.request().query(`SELECT ISNULL(MAX(id_rol), 0) AS ultimoId FROM tbl_roles`);
+    const nuevoId = ultimo.recordset[0].ultimoId + 1;
+
+    await pool.request()
+      .input("id_rol", sql.Int, nuevoId)
+      .input("nombre_rol", sql.VarChar(100), nombre_rol)
+      .input("descripcion", sql.VarChar(255), descripcion || "")
+      .query(`INSERT INTO tbl_roles (id_rol, nombre_rol, descripcion) VALUES (@id_rol, @nombre_rol, @descripcion);`);
+    res.status(201).json({
+      success: true,
+      message: "Rol creado correctamente",
+      id_rol: nuevoId
+    });
+  } catch (err) {
+    console.error("Error al crear rol:", err);
+    res.status(500).json({ success: false, message: "Error en el servidor" });
+  }
+});
+
+// Eliminar rol
+app.delete('/api/roles/:id_rol', async (req, res) => {
+  const { id_rol } = req.params;
+  try {
+    const pool = await poolPromise;    
+    const check = await pool.request().input("id_rol", sql.Int, id_rol).query(`SELECT COUNT(*) AS total FROM tbl_usuarios WHERE id_rol = @id_rol`);
+    const total = check.recordset[0].total;
+    if (total > 0) {
+      return res.status(400).json({
+        success: false,
+        message: `No se puede eliminar el rol porque hay ${total} usuario(s) asignado(s) a él.`,
+      });
+    }
+    await pool.request()
+      .input("id_rol", sql.Int, id_rol)
+      .query(`DELETE FROM tbl_roles WHERE id_rol = @id_rol`);
+
+    res.json({
+      success: true,
+      message: "Rol eliminado correctamente",
+    });
+
+  } catch (err) {
+    console.error("Error al eliminar rol:", err);
+    res.status(500).json({
+      success: false,
+      message: "Error al eliminar el rol en el servidor",
+    });
   }
 });
 
