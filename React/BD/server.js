@@ -36,19 +36,6 @@ let poolPromise = sql.connect(dbConfig)
     console.error('Error al conectar a SQL Server:', err);
   });
 
-/**
-async function connectToDb() {
-    try {
-        let pool = await sql.connect(dbConfig);
-        console.log('Conexión a SQL Server establecida correctamente.');
-        return pool;
-    } catch (err) {
-        console.error('Error al conectar a SQL Server:', err);
-    }
-}
-connectToDb();
- */
-
 // --- Endpoints ---
 // Login
 app.post("/api/login", async (req, res) => {
