@@ -1,0 +1,7 @@
+{
+  "name": "ticketsApp",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}

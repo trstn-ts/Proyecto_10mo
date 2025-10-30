@@ -1,0 +1,15 @@
+# Ignorar dependencias
+node_modules/
+
+# Archivos de entorno
+.env
+
+# Archivos temporales
+dist/
+build/
+.tmp/
+coverage/
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db

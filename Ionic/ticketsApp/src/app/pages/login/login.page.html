@@ -1,0 +1,49 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>login</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="login-container">
+  <div class="top-bar"></div>
+
+  <div class="login-box">
+    <h1><span class="bold">Pro</span>Tech</h1>
+    <p class="subtitle">HELP DESK SOLUTIONS</p>
+
+    <ion-item lines="none">
+      <ion-label position="stacked">Usuario</ion-label>
+      <ion-input
+        type="email"
+        placeholder="Ingresa tu usuario"
+        [(ngModel)]="correo"
+      ></ion-input>
+    </ion-item>
+
+    <ion-item lines="none">
+      <ion-label position="stacked">Contraseña</ion-label>
+      <ion-input
+        type="password"
+        placeholder="Ingresa tu contraseña"
+        [(ngModel)]="contrasena"
+      ></ion-input>
+    </ion-item>
+
+    <ion-button expand="block" color="danger" (click)="login()">
+      Entrar
+    </ion-button>
+
+    <p *ngIf="errorMsg" class="error">{{ errorMsg }}</p>
+  </div>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+
+  <div class="bottom-bar"></div>
+</ion-content>
