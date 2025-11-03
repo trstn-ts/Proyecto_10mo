@@ -8,12 +8,7 @@ function Roles() {
   const [usuarios, setUsuarios] = useState([]);
   const [rolSeleccionado, setRolSeleccionado] = useState(null);
   const [cargandoUsuarios, setCargandoUsuarios] = useState(false);
-  const [mostrandoModalUsuarios, setMostrandoModalUsuarios] = useState(false);
-
-  const [mostrandoModalCrear, setMostrandoModalCrear] = useState(false);
-  const [nuevoRol, setNuevoRol] = useState({ nombre_rol: "", descripcion: "" });
-  const [guardandoRol, setGuardandoRol] = useState(false);
-  const [mensajeRol, setMensajeRol] = useState("");
+  const [mostrandoModalUsuarios, setMostrandoModalUsuarios] = useState(false);  
   
   useEffect(() => {
     const obtenerRoles = async () => {
@@ -48,74 +43,10 @@ function Roles() {
     }
   };
 
-  const eliminarRol = async (id_rol) => {
-  if (!window.confirm("¿Estás seguro de que deseas eliminar este rol?")) return;
-
-  try {
-    const respuesta = await fetch(`http://localhost:3001/api/roles/${id_rol}`, {
-      method: "DELETE",
-    });
-
-    const data = await respuesta.json();
-
-    if (!respuesta.ok) {
-      alert(data.message || "Error al eliminar el rol");
-      return;
-    }
-
-    alert(data.message);    
-    setRoles(roles.filter((rol) => rol.id_rol !== id_rol));
-    } catch (err) {
-        console.error("Error al eliminar rol:", err);
-        alert("Ocurrió un error al intentar eliminar el rol");
-    }
-    };
-  
-  const guardarRol = async (e) => {
-    e.preventDefault();
-    if (!nuevoRol.nombre_rol.trim()) {
-      setMensajeRol("El nombre del rol es obligatorio");
-      return;
-    }
-
-    setGuardandoRol(true);
-    setMensajeRol("");
-
-    try {
-      const res = await fetch("http://localhost:3001/api/rolesNuevo", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(nuevoRol),
-      });
-
-      const data = await res.json();
-      if (data.success) {
-        setMensajeRol("Rol creado correctamente");
-        setRoles([...roles, { ...nuevoRol, id_rol: roles.length + 1 }]);
-        setTimeout(() => {
-          cerrarModalCrear();
-        }, 1000);
-      } else {
-        setMensajeRol(data.message || "Error al crear rol");
-      }
-    } catch (err) {
-      console.error(err);
-      setMensajeRol("Error al guardar el rol");
-    } finally {
-      setGuardandoRol(false);
-    }
-  };
-
   const cerrarModalUsuarios = () => {
     setMostrandoModalUsuarios(false);
     setRolSeleccionado(null);
     setUsuarios([]);
-  };
-
-  const cerrarModalCrear = () => {
-    setMostrandoModalCrear(false);
-    setNuevoRol({ nombre_rol: "", descripcion: "" });
-    setMensajeRol("");
   };
 
   if (cargando) return <p>Cargando roles...</p>;
@@ -130,10 +61,7 @@ function Roles() {
             <th>ID</th>
             <th>Nombre</th>
             <th>Descripción</th>
-            <th>Acciones</th>
-            <th>
-              <button onClick={() => setMostrandoModalCrear(true)}>+</button>
-            </th>
+            <th>Acciones</th>         
           </tr>
         </thead>
         <tbody>
@@ -141,9 +69,8 @@ function Roles() {
             <tr key={rol.id_rol}>
               <td>{rol.id_rol}</td>
               <td>{rol.nombre_rol}</td>
-              <td>{rol.descripcion}</td>
-              <td>
-                <button onClick={() => eliminarRol(rol.id_rol)}>Eliminar</button>
+              <td>{rol.descripcion_rol}</td>
+              <td>                
                 <button onClick={() => verUsuarios(rol)}>Usuarios asignados</button>
               </td>
             </tr>
@@ -170,46 +97,6 @@ function Roles() {
             <div style={{ marginTop: "15px", textAlign: "right" }}>
               <button onClick={cerrarModalUsuarios}>Cerrar</button>
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* --- Modal Crear Rol --- */}
-      {mostrandoModalCrear && (
-        <div style={estiloFondoModal}>
-          <div style={estiloModal}>
-            <h3>Crear nuevo rol</h3>
-            <form onSubmit={guardarRol}>
-              <div style={{ marginBottom: "10px" }}>
-                <label>Nombre del rol:</label><br />
-                <input
-                  type="text"
-                  value={nuevoRol.nombre_rol}
-                  onChange={(e) => setNuevoRol({ ...nuevoRol, nombre_rol: e.target.value })}
-                  required
-                />
-              </div>
-
-              <div style={{ marginBottom: "10px" }}>
-                <label>Descripción:</label><br />
-                <textarea
-                  value={nuevoRol.descripcion}
-                  onChange={(e) => setNuevoRol({ ...nuevoRol, descripcion: e.target.value })}
-                  rows="3"
-                />
-              </div>
-
-              {mensajeRol && <p>{mensajeRol}</p>}
-
-              <div style={{ textAlign: "right" }}>
-                <button type="button" onClick={cerrarModalCrear} disabled={guardandoRol}>
-                  Cancelar
-                </button>{" "}
-                <button type="submit" disabled={guardandoRol}>
-                  {guardandoRol ? "Guardando..." : "Guardar"}
-                </button>
-              </div>
-            </form>
           </div>
         </div>
       )}

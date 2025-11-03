@@ -1,13 +1,21 @@
 import React from "react";
-import { Link, Outlet } from "react-router-dom";
+import { useNavigate, Link, Outlet } from "react-router-dom";
 import "./Layout.css";
 
-function Layout() {
+function Layout({ setAutenticado }) {
+  const navigate = useNavigate();
+  const handleLogout = () => {
+    localStorage.clear();
+    setAutenticado(false);
+    navigate("/login");
+  };
+
   return (
     <div className="layout">
       {/* --- Encabezado --- */}
       <header className="header">
         <h1>HelpDesk</h1>
+        <button onClick={handleLogout}>Cerrar sesión</button>
       </header>
 
       {/* --- Barra de navegacion --- */}

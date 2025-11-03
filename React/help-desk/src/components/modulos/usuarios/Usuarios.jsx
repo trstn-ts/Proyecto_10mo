@@ -96,7 +96,7 @@ function Usuarios() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(nuevoUsuario),
       });
-      const data = await res.json();
+      const data = await res.json(); 
 
       if (data.success) {
         alert("Usuario creado correctamente");

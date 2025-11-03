@@ -89,16 +89,12 @@ function Areas() {
 
       const data = await res.json();
       if (data.success) {
-        setMensajeArea("Área creada correctamente");
-        setAreas([
-          ...areas,
-          {
-            id_area: data.id_area,
-            nombre_area: nuevoArea.nombre_area,
-            descripcion_area: nuevoArea.descripcion || "",
-          },
-        ]);
-        setTimeout(() => cerrarModalCrear(), 1000);
+        
+        alert("Área creada correctamente");
+        const resAreas = await fetch("http://localhost:3001/api/areas");
+        const areasActualizadas = await resAreas.json();
+        setAreas(areasActualizadas);
+        cerrarModalCrear();                                      
       } else {
         setMensajeArea(data.message || "Error al crear área");
       }

@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import Layout from "./components/fijos/Layout";
 import Login from "./components/fijos/Login";
 
@@ -11,15 +11,22 @@ import Roles from "./components/modulos/roles/Roles";
 import Areas from "./components/modulos/areas/Areas";
 import UsuariosInactivos from "./components/modulos/usuarios/UsuariosInactivos";
 
-function App() {
-  const [autenticado, setAutenticado] = useState(false);
+function App() {  
+  const [autenticado, setAutenticado] = useState(() => {
+    return localStorage.getItem("autenticado") === "true";
+  });
 
   return (
     <Router>
       <Routes>
+        {/* Ruta de login */}
         <Route path="/login" element={<Login setAutenticado={setAutenticado} />} />
-      
-        <Route path="/" element={autenticado ? <Layout /> : <Navigate to="/login" />}>
+
+        {/* Rutas protegidas */}
+        <Route
+          path="/"
+          element={autenticado ? <Layout setAutenticado={setAutenticado} /> : <Navigate to="/login" />}
+        >
           <Route path="inicio" element={<Inicio />} />
           <Route path="usuarios" element={<Usuarios />} />
           <Route path="usuarios-inactivos" element={<UsuariosInactivos />} />

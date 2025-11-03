@@ -9,6 +9,7 @@ function Login({ setAutenticado }) {
 
   const manejarSubmit = async (e) => {
     e.preventDefault();
+    setError("");
 
     try {
       const respuesta = await fetch("http://localhost:3001/api/login", {
@@ -19,8 +20,18 @@ function Login({ setAutenticado }) {
 
       const datos = await respuesta.json();
 
-      if (datos.success) {
+      if (datos.success) {        
+        localStorage.setItem("token", datos.token);
+        localStorage.setItem("usuario", JSON.stringify({
+          id_usuario: datos.user.id_usuario,
+          nombre: datos.user.nombre,
+          apellido: datos.user.apellido,
+          id_rol: datos.user.id_rol
+        }));
+        localStorage.setItem("autenticado", "true");
+        
         setAutenticado(true);
+
         navigate("/inicio");
       } else {
         setError(datos.message);
@@ -39,12 +50,14 @@ function Login({ setAutenticado }) {
           placeholder="Usuario"
           value={usuario}
           onChange={(e) => setUsuario(e.target.value)}
+          required
         />
         <input
           type="password"
           placeholder="Contraseña"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          required
         />
         <button type="submit">Entrar</button>
       </form>
