@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule, AlertController } from '@ionic/angular';
+import { IonicModule, AlertController, NavController } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
 import axios from 'axios';
 
@@ -8,36 +8,46 @@ import axios from 'axios';
   selector: 'app-login',
   standalone: true,
   imports: [CommonModule, IonicModule, FormsModule],
+  providers: [AlertController],
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
 })
 export class LoginPage {
-  correo: string = '';
+  usuario: string = '';
   contrasena: string = '';
   errorMsg: string = '';
 
-  constructor(private alertCtrl: AlertController) {}
+  constructor(
+    private alertCtrl: AlertController,
+    private navCtrl: NavController
+  ) {}
 
   async login() {
     this.errorMsg = '';
 
     try {
       const res = await axios.post('http://localhost:3000/api/login', {
-        correo: this.correo,
+        usuario: this.usuario,
         contrasena: this.contrasena,
       });
 
-      const usuario = res.data.usuario;
+      const user = res.data.usuario;
+
+      localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('idUsuario', user.id);
+      localStorage.setItem('idArea', user.area);
+
       const alert = await this.alertCtrl.create({
         header: 'Bienvenido',
-        message: `Hola ${usuario.nombre} ${usuario.apellido}`,
+        message: `Hola ${user.nombre} ${user.apellido}`,
         buttons: ['OK'],
       });
       await alert.present();
+
+      this.navCtrl.navigateRoot('/home');
     } catch (err: any) {
-      console.error(err);
-      this.errorMsg =
-        err.response?.data?.error || 'Error al iniciar sesión.';
+      console.error('Error en login:', err);
+      this.errorMsg = err.response?.data?.error || 'Error al iniciar sesión. Verifique credenciales y conexión.';
     }
   }
 }

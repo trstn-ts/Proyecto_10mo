@@ -1,0 +1,63 @@
+<ion-header [translucent]="true"></ion-header>
+
+<ion-content class="home-container">
+
+  <div *ngIf="loading" class="ion-text-center ion-padding">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Cargando tickets...</p>
+  </div>
+
+  <div *ngIf="error" class="ion-padding ion-text-center">
+    <p class="ion-text-danger">{{ error }}</p>
+  </div>
+  <div *ngIf="!loading && !error">
+    <div class="last-ticket-card" *ngIf="ultimoTicket">
+      <h2>Último Ticket Levantado</h2>
+      <p>
+        <strong>Estado:</strong>
+        <span
+          class="status"
+          [class]="{'ion-text-success': ultimoTicket.estado === 'Cerrado', 'ion-text-warning': ultimoTicket.estado === 'En proceso', 'ion-text-danger': ultimoTicket.estado === 'Cancelado'}"
+        >
+          {{ ultimoTicket.estado }}
+        </span>
+      </p>
+      <ion-progress-bar
+        [value]="ultimoTicket.estado === 'Cerrado' ? 1 : ultimoTicket.estado === 'En proceso' ? 0.6 : 0.1"
+        [color]="ultimoTicket.estado === 'Cerrado' ? 'success' : 'warning'"
+      ></ion-progress-bar>
+      <small>
+        Prioridad: {{ ultimoTicket.prioridad }} | Fecha: {{ ultimoTicket.fecha_creacion | date: 'short' }}
+      </small>
+    </div>
+    
+    <ion-button expand="block" color="danger" class="raise-btn" (click)="goToTicketUp()">
+    Levantar Ticket
+    </ion-button>
+
+
+    <h3 class="section-title">Últimos Tickets</h3>
+
+    <div class="ticket-list" *ngIf="tickets.length > 0">
+      <ion-card *ngFor="let ticket of tickets">
+        <ion-card-content>
+          <ion-label>
+            <h2>{{ ticket.titulo }}</h2>
+            <p>{{ ticket.descripcion }}</p>
+            <small>
+              Estado:
+              <span [class]="{'ion-text-success': ticket.estado === 'Cerrado', 'ion-text-warning': ticket.estado === 'En proceso'}">
+                {{ ticket.estado }}
+              </span>
+              | Prioridad: {{ ticket.prioridad }} | Fecha: {{ ticket.fecha_creacion | date: 'short' }}
+            </small>
+          </ion-label>
+        </ion-card-content>
+      </ion-card>
+    </div>
+    
+    <div *ngIf="tickets.length === 0 && !loading" class="ion-padding ion-text-center">
+        <p>No has levantado ningún ticket aún. ¡Comienza ahora!</p>
+    </div>
+  </div>
+</ion-content>

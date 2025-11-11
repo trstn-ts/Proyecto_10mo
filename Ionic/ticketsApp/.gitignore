@@ -1,0 +1,13 @@
+# Dependencias de Node
+node_modules/
+
+# Archivos de logs y depuración
+npm-debug.log*
+yarn-error.log*
+
+# Compilaciones
+/build
+/dist
+
+# Archivos del sistema operativo (macOS)
+.DS_Store

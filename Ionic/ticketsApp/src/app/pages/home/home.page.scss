@@ -1,0 +1,63 @@
+    .home-container {
+    --background: #fff;
+    padding: 16px;
+    }
+
+    .last-ticket-card {
+    background: #c62828;
+    color: white;
+    padding: 16px;
+    border-radius: 16px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    margin-bottom: 20px;
+
+    h2 {
+        margin: 0 0 8px 0;
+        font-weight: bold;
+    }
+
+    .status {
+        color: #ffe082;
+    }
+
+    ion-progress-bar {
+        margin-top: 10px;
+        --progress-background: white;
+        --progress-color: #b71c1c;
+    }
+    }
+
+    .raise-btn {
+    border-radius: 20px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    }
+
+    .section-title {
+    font-weight: bold;
+    margin: 10px 0;
+    color: #c62828;
+    }
+
+    .ticket-list {
+    ion-card {
+        background: #fff5f5;
+        border: 2px solid #ffcdd2;
+        border-radius: 12px;
+        margin-bottom: 10px;
+
+        ion-card-content {
+        h2 {
+            font-size: 16px;
+            margin: 0;
+            font-weight: bold;
+            color: #b71c1c;
+        }
+
+        p {
+            font-size: 14px;
+            color: #444;
+        }
+        }
+    }
+    }
