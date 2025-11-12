@@ -1,9 +1,11 @@
 import React from "react";
-import { useNavigate, Link, Outlet } from "react-router-dom";
+import { useNavigate, NavLink, Outlet } from "react-router-dom";
+import "bootstrap/dist/css/bootstrap.min.css";
 import "./Layout.css";
 
 function Layout({ setAutenticado }) {
   const navigate = useNavigate();
+
   const handleLogout = () => {
     localStorage.clear();
     setAutenticado(false);
@@ -13,40 +15,53 @@ function Layout({ setAutenticado }) {
   return (
     <div className="layout">
       {/* --- Encabezado --- */}
-      <header className="header">
-        <h1>HelpDesk</h1>
-        <button onClick={handleLogout}>Cerrar sesión</button>
+      <header className="header d-flex justify-content-between align-items-center">
+        <h1 className="logo-text">HelpDesk</h1>
+
+        <button
+          onClick={handleLogout}
+          className="btn btn-danger logout-btn d-flex align-items-center gap-2"
+        >
+          <i className="bi bi-box-arrow-right"></i> Cerrar sesión
+        </button>
       </header>
 
-      {/* --- Barra de navegacion --- */}
+      {/* --- Menú lateral --- */}
       <aside className="sidebar">
         <nav>
           <ul>
             <li>
-              <Link to="/inicio">Inicio</Link>
+              <NavLink to="/inicio" activeclassname="activo">Inicio</NavLink>
             </li>
             <li>
-              <Link to="/usuarios">Usuarios</Link>
-              <Link to="/usuarios-inactivos">Usuarios Inactivos</Link>
+              <NavLink to="/usuarios" activeclassname="activo">Usuarios</NavLink>
+              <NavLink to="/usuarios-inactivos" activeclassname="activo">
+                Usuarios Inactivos
+              </NavLink>
             </li>
             <li>
-              <Link to="/tickets">Tickets</Link>
-              <Link to="/tickets-sin-asignar">Tickets Sin Asignar</Link>
-            </li>              
+              <NavLink to="/tickets" activeclassname="activo">Tickets</NavLink>
+              <NavLink to="/tickets-sin-asignar" activeclassname="activo">
+                Tickets Sin Asignar
+              </NavLink>
+            </li>
             <li>
-              <Link to="/roles">Roles</Link>
-            </li>                         
+              <NavLink to="/roles" activeclassname="activo">Roles</NavLink>
+            </li>
             <li>
-              <Link to="/areas">Areas</Link>
+              <NavLink to="/areas" activeclassname="activo">Áreas</NavLink>
             </li>
           </ul>
         </nav>
-      </aside>    
+      </aside>
+
+      {/* --- Contenido principal --- */}
       <main className="main-content">
-        <Outlet /> 
+        <Outlet />
       </main>
     </div>
   );
 }
 
 export default Layout;
+
