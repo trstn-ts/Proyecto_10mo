@@ -32,15 +32,6 @@
       ></ion-textarea>
     </ion-item>
 
-    <ion-item lines="none">
-      <ion-label position="stacked">Prioridad</ion-label>
-      <ion-select placeholder="Selecciona" [(ngModel)]="prioridad">
-        <ion-select-option value="Alta">Alta</ion-select-option>
-        <ion-select-option value="Media">Media</ion-select-option>
-        <ion-select-option value="Baja">Baja</ion-select-option>
-      </ion-select>
-    </ion-item>
-
     <ion-button expand="block" color="danger" (click)="registrarTicket()">
       Enviar Ticket
     </ion-button>

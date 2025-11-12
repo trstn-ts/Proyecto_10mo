@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { IonicModule, AlertController, NavController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -14,22 +14,19 @@ import axios from 'axios';
 export class TicketUpPage {
   titulo: string = '';
   descripcion: string = '';
-  prioridad: string = '';
   mensaje: string = '';
 
-  constructor(
-    private alertCtrl: AlertController,
-    private navCtrl: NavController
-  ) {}
+  private alertCtrl = inject(AlertController);
+  private navCtrl = inject(NavController);
 
   async registrarTicket() {
-    if (!this.titulo || !this.descripcion || !this.prioridad) {
+    if (!this.titulo || !this.descripcion) {
       this.mensaje = 'Por favor completa todos los campos.';
       return;
     }
 
     try {
-      const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
+      const usuario = JSON.parse(localStorage.getItem('user') || '{}');
       if (!usuario || !usuario.id) {
         this.mensaje = 'No se encontró el usuario logueado.';
         return;
@@ -37,10 +34,9 @@ export class TicketUpPage {
 
       await axios.post('http://localhost:3000/api/tickets', {
         id_usuario: usuario.id,
-        id_area: usuario.area, 
+        id_area: usuario.area,
         titulo: this.titulo,
         descripcion_problema: this.descripcion,
-        prioridad: this.prioridad,
       });
 
       const alert = await this.alertCtrl.create({
