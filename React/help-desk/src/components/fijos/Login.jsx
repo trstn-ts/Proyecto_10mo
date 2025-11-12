@@ -1,5 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "./Login.css"; 
+import logo from "../../assets/logo.png";
+
+
 
 function Login({ setAutenticado }) {
   const [usuario, setUsuario] = useState("");
@@ -20,18 +24,19 @@ function Login({ setAutenticado }) {
 
       const datos = await respuesta.json();
 
-      if (datos.success) {        
+      if (datos.success) {
         localStorage.setItem("token", datos.token);
-        localStorage.setItem("usuario", JSON.stringify({
-          id_usuario: datos.user.id_usuario,
-          nombre: datos.user.nombre,
-          apellido: datos.user.apellido,
-          id_rol: datos.user.id_rol
-        }));
+        localStorage.setItem(
+          "usuario",
+          JSON.stringify({
+            id_usuario: datos.user.id_usuario,
+            nombre: datos.user.nombre,
+            apellido: datos.user.apellido,
+            id_rol: datos.user.id_rol,
+          })
+        );
         localStorage.setItem("autenticado", "true");
-        
         setAutenticado(true);
-
         navigate("/inicio");
       } else {
         setError(datos.message);
@@ -42,26 +47,42 @@ function Login({ setAutenticado }) {
   };
 
   return (
-    <div className="login-container">
-      <h2>Iniciar Sesión</h2>
-      <form onSubmit={manejarSubmit}>
-        <input
-          type="text"
-          placeholder="Usuario"
-          value={usuario}
-          onChange={(e) => setUsuario(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Contraseña"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <button type="submit">Entrar</button>
-      </form>
-      {error && <p style={{ color: "red" }}>{error}</p>}
+    <div className="login-page">
+      <div className="login-header"></div>
+
+      <div className="login-content">
+      
+        <img src={logo} alt="ProTech" className="logo" />
+
+
+        <div className="login-box">
+          <form onSubmit={manejarSubmit}>
+            <label>Usuario</label>
+            <input
+              type="text"
+              placeholder="Ingresa tu usuario"
+              value={usuario}
+              onChange={(e) => setUsuario(e.target.value)}
+              required
+            />
+
+            <label>Contraseña</label>
+            <input
+              type="password"
+              placeholder="Ingresa tu contraseña"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+
+            <button type="submit">Entrar</button>
+          </form>
+
+          {error && <p className="error">{error}</p>}
+        </div>
+      </div>
+
+      <div className="login-footer"></div>
     </div>
   );
 }
