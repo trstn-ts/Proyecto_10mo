@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { IonicModule, NavController } from '@ionic/angular';
+import { IonicModule, NavController, MenuController } from '@ionic/angular';
 import { CommonModule, DatePipe } from '@angular/common';
-// --- Importación estándar de axios ---
 import axios from 'axios';
 
 @Component({
@@ -16,10 +15,17 @@ export class HomePage implements OnInit {
   ultimoTicket: any = null;
   loading: boolean = true;
   error: string | null = null;
-  
-  constructor(private navCtrl: NavController) {}
+
+  constructor(
+    private navCtrl: NavController,
+    private menuCtrl: MenuController
+  ) {}
 
   async ngOnInit() {
+    this.cargarTickets();
+  }
+
+  async cargarTickets() {
     this.loading = true;
     this.error = null;
 
@@ -27,29 +33,48 @@ export class HomePage implements OnInit {
     const idUsuario = idUsuarioStr ? parseInt(idUsuarioStr, 10) : null;
 
     if (!idUsuario) {
-      this.error = ' Error: No hay un usuario logueado. Redirigiendo a Login.';
+      this.error = 'Error: No hay un usuario logueado. Redirigiendo a Login.';
       this.loading = false;
       setTimeout(() => this.navCtrl.navigateRoot('/login'), 2000);
       return;
     }
 
     try {
-      const response = await axios.get(`http://localhost:3000/api/tickets/usuario/${idUsuario}`);
+      const response = await axios.get(
+        `http://localhost:3000/api/tickets/usuario/${idUsuario}`
+      );
 
       this.tickets = response.data;
-
       if (this.tickets.length > 0) {
         this.ultimoTicket = this.tickets[0];
       }
     } catch (err) {
-      console.error(' Error cargando tickets:', err);
-      this.error = 'Error al cargar los tickets. Verifica que el backend esté funcionando.';
+      console.error('Error cargando tickets:', err);
+      this.error =
+        'Error al cargar los tickets. Verifica que el backend esté funcionando.';
     } finally {
       this.loading = false;
     }
   }
 
+  openMenu() {
+    this.menuCtrl.open('menuPrincipal');
+  }
+
   goToTicketUp() {
     this.navCtrl.navigateForward('/ticket-up');
+  }
+
+  goToMisTickets() {
+    this.navCtrl.navigateForward('/mis-tickets');
+  }
+
+  goToPerfil() {
+    this.navCtrl.navigateForward('/perfil');
+  }
+
+  cerrarSesion() {
+    localStorage.clear();
+    this.navCtrl.navigateRoot('/login');
   }
 }

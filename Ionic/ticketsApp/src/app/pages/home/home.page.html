@@ -1,7 +1,52 @@
-<ion-header [translucent]="true"></ion-header>
+<ion-menu side="start" menuId="menuPrincipal" contentId="main-content">
+  <ion-header>
+    <ion-toolbar color="danger">
+      <ion-title>Menú</ion-title>
+    </ion-toolbar>
+  </ion-header>
 
-<ion-content class="home-container">
+  <ion-content>
+    <ion-list>
+      <ion-item>
+        <ion-icon slot="start" name="home-outline"></ion-icon>
+        <ion-label>Inicio</ion-label>
+      </ion-item>
 
+      <ion-item button (click)="goToTicketUp()">
+        <ion-icon slot="start" name="add-circle-outline"></ion-icon>
+        <ion-label>Levantar Ticket</ion-label>
+      </ion-item>
+
+      <ion-item button (click)="goToMisTickets()">
+        <ion-icon slot="start" name="document-text-outline"></ion-icon>
+        <ion-label>Mis Tickets</ion-label>
+      </ion-item>
+
+      <ion-item button (click)="goToPerfil()">
+        <ion-icon slot="start" name="person-outline"></ion-icon>
+        <ion-label>Mi Perfil</ion-label>
+      </ion-item>
+    </ion-list>
+
+    <div class="logout-btn">
+      <ion-button expand="block" color="medium" (click)="cerrarSesion()">
+        <ion-icon name="log-out-outline" slot="start"></ion-icon>
+        Cerrar Sesión
+      </ion-button>
+    </div>
+  </ion-content>
+</ion-menu>
+
+<ion-header [translucent]="true">
+  <ion-toolbar color="danger">
+    <ion-buttons slot="start">
+      <ion-menu-button autoHide="false"></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Inicio</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content id="main-content" class="home-container">
   <div *ngIf="loading" class="ion-text-center ion-padding">
     <ion-spinner name="crescent"></ion-spinner>
     <p>Cargando tickets...</p>
@@ -10,6 +55,7 @@
   <div *ngIf="error" class="ion-padding ion-text-center">
     <p class="ion-text-danger">{{ error }}</p>
   </div>
+
   <div *ngIf="!loading && !error">
     <div class="last-ticket-card" *ngIf="ultimoTicket">
       <h2>Último Ticket Levantado</h2>
@@ -17,24 +63,41 @@
         <strong>Estado:</strong>
         <span
           class="status"
-          [class]="{'ion-text-success': ultimoTicket.estado === 'Cerrado', 'ion-text-warning': ultimoTicket.estado === 'En proceso', 'ion-text-danger': ultimoTicket.estado === 'Cancelado'}"
+          [class]="{
+            'ion-text-success': ultimoTicket.estado === 'Cerrado',
+            'ion-text-warning': ultimoTicket.estado === 'En proceso',
+            'ion-text-danger': ultimoTicket.estado === 'Cancelado'
+          }"
         >
           {{ ultimoTicket.estado }}
         </span>
       </p>
       <ion-progress-bar
-        [value]="ultimoTicket.estado === 'Cerrado' ? 1 : ultimoTicket.estado === 'En proceso' ? 0.6 : 0.1"
-        [color]="ultimoTicket.estado === 'Cerrado' ? 'success' : 'warning'"
+        [value]="
+          ultimoTicket.estado === 'Cerrado'
+            ? 1
+            : ultimoTicket.estado === 'En proceso'
+            ? 0.6
+            : 0.1
+        "
+        [color]="
+          ultimoTicket.estado === 'Cerrado' ? 'success' : 'warning'
+        "
       ></ion-progress-bar>
       <small>
-        Prioridad: {{ ultimoTicket.prioridad }} | Fecha: {{ ultimoTicket.fecha_creacion | date: 'short' }}
+        Prioridad: {{ ultimoTicket.prioridad }} | Fecha:
+        {{ ultimoTicket.fecha_creacion | date: 'short' }}
       </small>
     </div>
-    
-    <ion-button expand="block" color="danger" class="raise-btn" (click)="goToTicketUp()">
-    Levantar Ticket
-    </ion-button>
 
+    <ion-button
+      expand="block"
+      color="danger"
+      class="raise-btn"
+      (click)="goToTicketUp()"
+    >
+      Levantar Ticket
+    </ion-button>
 
     <h3 class="section-title">Últimos Tickets</h3>
 
@@ -46,18 +109,27 @@
             <p>{{ ticket.descripcion }}</p>
             <small>
               Estado:
-              <span [class]="{'ion-text-success': ticket.estado === 'Cerrado', 'ion-text-warning': ticket.estado === 'En proceso'}">
+              <span
+                [class]="{
+                  'ion-text-success': ticket.estado === 'Cerrado',
+                  'ion-text-warning': ticket.estado === 'En proceso'
+                }"
+              >
                 {{ ticket.estado }}
               </span>
-              | Prioridad: {{ ticket.prioridad }} | Fecha: {{ ticket.fecha_creacion | date: 'short' }}
+              | Prioridad: {{ ticket.prioridad }} | Fecha:
+              {{ ticket.fecha_creacion | date: 'short' }}
             </small>
           </ion-label>
         </ion-card-content>
       </ion-card>
     </div>
-    
-    <div *ngIf="tickets.length === 0 && !loading" class="ion-padding ion-text-center">
-        <p>No has levantado ningún ticket aún. ¡Comienza ahora!</p>
+
+    <div
+      *ngIf="tickets.length === 0 && !loading"
+      class="ion-padding ion-text-center"
+    >
+      <p>No has levantado ningún ticket aún. ¡Comienza ahora!</p>
     </div>
   </div>
 </ion-content>

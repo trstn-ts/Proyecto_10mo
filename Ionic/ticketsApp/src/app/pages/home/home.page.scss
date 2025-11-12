@@ -7,7 +7,6 @@
     background: #c62828;
     color: white;
     padding: 16px;
-    border-radius: 16px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     margin-bottom: 20px;
 
@@ -28,12 +27,14 @@
     }
 
     .raise-btn {
+    padding: 20px;
     border-radius: 20px;
     font-weight: bold;
     margin-bottom: 20px;
     }
 
     .section-title {
+    padding-left: 20px;
     font-weight: bold;
     margin: 10px 0;
     color: #c62828;
@@ -61,3 +62,33 @@
         }
     }
     }
+
+    .logout-container {
+    position: absolute;
+    bottom: 20px;
+    width: 100%;
+    padding: 0 16px;
+    }
+
+    ion-menu {
+    --width: 260px;
+    }
+
+    ion-menu ion-icon {
+    color: #c62828;
+    font-size: 22px;
+    }
+
+    ion-menu ion-item {
+    --padding-start: 10px;
+    --padding-end: 10px;
+    }
+
+    .logout-btn {
+  position: absolute;
+  bottom: 20px;
+  width: 100%;
+  padding: 0 16px;
+}
+
+
