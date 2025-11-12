@@ -11,6 +11,8 @@ import Roles from "./components/modulos/roles/Roles";
 import Areas from "./components/modulos/areas/Areas";
 import UsuariosInactivos from "./components/modulos/usuarios/UsuariosInactivos";
 
+import "bootstrap-icons/font/bootstrap-icons.css";
+
 function App() {  
   const [autenticado, setAutenticado] = useState(() => {
     return localStorage.getItem("autenticado") === "true";
