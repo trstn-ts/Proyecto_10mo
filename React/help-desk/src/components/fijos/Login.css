@@ -1,1 +1,80 @@
 
+/* Fondo general */
+.login-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #fff;
+}
+
+/* Barras rojas arriba y abajo */
+.login-header,
+.login-footer {
+  background-color: #c60000;
+  height: 70px;
+  width: 100%;
+}
+
+/* Contenedor principal */
+.login-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Logo */
+.logo {
+  width: 200px;
+  margin-bottom: 30px;
+}
+
+/* Caja del formulario */
+.login-box {
+  width: 320px;
+  background: #fff;
+  padding: 30px 25px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Inputs */
+.login-box label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+
+.login-box input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+/* Botón */
+.login-box button {
+  width: 100%;
+  padding: 10px;
+  background-color: #c60000;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.login-box button:hover {
+  background-color: #a00000;
+}
+
+/* Error */
+.error {
+  color: red;
+  text-align: center;
+  margin-top: 10px;
+}
