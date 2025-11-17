@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from "react";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap-icons/font/bootstrap-icons.css";
+import "../usuarios/Usuarios.css"; 
 
 function Areas() {
   const [areas, setAreas] = useState([]);
@@ -11,16 +14,19 @@ function Areas() {
   const [mostrandoModalUsuarios, setMostrandoModalUsuarios] = useState(false);
 
   const [mostrandoModalCrear, setMostrandoModalCrear] = useState(false);
-  const [nuevoArea, setNuevoArea] = useState({ nombre_area: "", descripcion: "" });
+  const [nuevoArea, setNuevoArea] = useState({
+    nombre_area: "",
+    descripcion: "",
+  });
   const [guardandoArea, setGuardandoArea] = useState(false);
   const [mensajeArea, setMensajeArea] = useState("");
-  
+
   useEffect(() => {
     const obtenerAreas = async () => {
       try {
-        const respuesta = await fetch("http://localhost:3001/api/areas");
-        if (!respuesta.ok) throw new Error("Error al obtener áreas");
-        const datos = await respuesta.json();
+        const res = await fetch("http://localhost:3001/api/areas");
+        if (!res.ok) throw new Error("Error al obtener áreas");
+        const datos = await res.json();
         setAreas(datos);
       } catch (err) {
         setError(err.message);
@@ -28,15 +34,19 @@ function Areas() {
         setCargando(false);
       }
     };
+
     obtenerAreas();
   }, []);
-  
+
   const verUsuarios = async (area) => {
     setAreaSeleccionada(area);
     setMostrandoModalUsuarios(true);
     setCargandoUsuarios(true);
+
     try {
-      const res = await fetch(`http://localhost:3001/api/areasUsuarios?id_area=${area.id_area}`);
+      const res = await fetch(
+        `http://localhost:3001/api/areasUsuarios?id_area=${area.id_area}`
+      );
       if (!res.ok) throw new Error("Error al obtener usuarios");
       const datos = await res.json();
       setUsuarios(datos);
@@ -49,29 +59,31 @@ function Areas() {
   };
 
   const eliminarArea = async (id_area) => {
-    if (!window.confirm("¿Estás seguro de que deseas eliminar esta área?")) return;
+    if (!window.confirm("¿Seguro que deseas eliminar esta área?")) return;
 
     try {
-      const respuesta = await fetch(`http://localhost:3001/api/areas/${id_area}`, {
-        method: "DELETE",
-      });
-      const data = await respuesta.json();
+      const res = await fetch(
+        `http://localhost:3001/api/areas/${id_area}`,
+        { method: "DELETE" }
+      );
+      const data = await res.json();
 
-      if (!respuesta.ok) {
+      if (!res.ok) {
         alert(data.message || "Error al eliminar el área");
         return;
       }
 
       alert(data.message);
-      setAreas(areas.filter((area) => area.id_area !== id_area));
+      setAreas(areas.filter((a) => a.id_area !== id_area));
     } catch (err) {
-      console.error("Error al eliminar área:", err);
+      console.error("Error:", err);
       alert("Ocurrió un error al intentar eliminar el área");
     }
   };
-  
+
   const guardarArea = async (e) => {
     e.preventDefault();
+
     if (!nuevoArea.nombre_area.trim()) {
       setMensajeArea("El nombre del área es obligatorio");
       return;
@@ -88,15 +100,15 @@ function Areas() {
       });
 
       const data = await res.json();
+
       if (data.success) {
-        
         alert("Área creada correctamente");
         const resAreas = await fetch("http://localhost:3001/api/areas");
-        const areasActualizadas = await resAreas.json();
-        setAreas(areasActualizadas);
-        cerrarModalCrear();                                      
+        const nuevasAreas = await resAreas.json();
+        setAreas(nuevasAreas);
+        cerrarModalCrear();
       } else {
-        setMensajeArea(data.message || "Error al crear área");
+        setMensajeArea(data.message || "Error al crear el área");
       }
     } catch (err) {
       console.error(err);
@@ -118,94 +130,152 @@ function Areas() {
     setMensajeArea("");
   };
 
-  if (cargando) return <p>Cargando áreas...</p>;
-  if (error) return <p style={{ color: "red" }}>{error}</p>;
+  if (cargando) return <p className="text-center mt-5">Cargando áreas...</p>;
+  if (error) return <p className="text-danger text-center mt-5">{error}</p>;
 
   return (
-    <div>
-      <h2>Lista de Áreas</h2>
-      <table border="1" cellPadding="10" style={{ borderCollapse: "collapse", width: "100%" }}>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Nombre</th>
-            <th>Descripción</th>
-            <th>Acciones</th>
-            <th>
-              <button onClick={() => setMostrandoModalCrear(true)}>+</button>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {areas.map((area) => (
-            <tr key={area.id_area}>
-              <td>{area.id_area}</td>
-              <td>{area.nombre_area}</td>
-              <td>{area.descripcion_area}</td>
-              <td>
-                <button onClick={() => eliminarArea(area.id_area)}>Eliminar</button>
-                <button onClick={() => verUsuarios(area)}>Usuarios asignados</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="container mt-4 usuarios-container">
 
-      {/* --- Modal Usuarios Asignados --- */}
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h2 className="text-dark">Lista de Áreas</h2>
+
+        <button
+          className="btn btn-primary"
+          onClick={() => setMostrandoModalCrear(true)}
+        >
+          <i className="bi bi-plus-circle"></i> Nueva área
+        </button>
+      </div>
+
+      <div className="table-responsive shadow-sm rounded">
+        <table className="table table-hover align-middle">
+          <thead className="table-danger">
+            <tr>
+              <th>ID</th>
+              <th>Nombre</th>
+              <th>Descripción</th>
+              <th className="text-center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {areas.map((area) => (
+              <tr key={area.id_area}>
+                <td>{area.id_area}</td>
+                <td>{area.nombre_area}</td>
+                <td>{area.descripcion_area}</td>
+
+                <td className="text-center">
+                  <button
+                    className="btn btn-outline-danger btn-sm me-2"
+                    onClick={() => eliminarArea(area.id_area)}
+                  >
+                    <i className="bi bi-trash"></i>
+                  </button>
+
+                  <button
+                    className="btn btn-outline-primary btn-sm"
+                    onClick={() => verUsuarios(area)}
+                  >
+                    <i className="bi bi-people"></i> Usuarios
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Modal Usuarios */}
       {mostrandoModalUsuarios && (
-        <div style={estiloFondoModal}>
-          <div style={estiloModal}>
-            <h3>Usuarios con el área: {areaSeleccionada?.nombre_area}</h3>
+        <div className="custom-modal">
+          <div className="custom-modal-content">
+            <h4>
+              Usuarios asignados al área:{" "}
+              <strong>{areaSeleccionada?.nombre_area}</strong>
+            </h4>
+
             {cargandoUsuarios ? (
-              <p>Cargando usuarios...</p>
+              <p className="text-center mt-3">Cargando usuarios...</p>
             ) : usuarios.length > 0 ? (
               <ul>
                 {usuarios.map((u) => (
-                  <li key={u.id_usuario}>{u.nombre_usuario || "(Sin nombre registrado)"}</li>
+                  <li key={u.id_usuario}>
+                    {u.nombre_usuario || "(Sin nombre registrado)"}
+                  </li>
                 ))}
               </ul>
             ) : (
-              <p>No hay usuarios asignados a esta área.</p>
+              <p className="text-center mt-3">
+                No hay usuarios asignados a esta área.
+              </p>
             )}
-            <div style={{ marginTop: "15px", textAlign: "right" }}>
-              <button onClick={cerrarModalUsuarios}>Cerrar</button>
+
+            <div className="d-flex justify-content-end mt-3">
+              <button className="btn btn-secondary" onClick={cerrarModalUsuarios}>
+                Cerrar
+              </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* --- Modal Crear Área --- */}
+      {/* Modal Crear Área */}
       {mostrandoModalCrear && (
-        <div style={estiloFondoModal}>
-          <div style={estiloModal}>
-            <h3>Crear nueva área</h3>
+        <div className="custom-modal">
+          <div className="custom-modal-content">
+            <h4>Crear nueva área</h4>
+
             <form onSubmit={guardarArea}>
-              <div style={{ marginBottom: "10px" }}>
-                <label>Nombre del área:</label><br />
+              <div className="mb-3">
+                <label>Nombre del área</label>
                 <input
                   type="text"
+                  className="form-control"
                   value={nuevoArea.nombre_area}
-                  onChange={(e) => setNuevoArea({ ...nuevoArea, nombre_area: e.target.value })}
+                  onChange={(e) =>
+                    setNuevoArea({
+                      ...nuevoArea,
+                      nombre_area: e.target.value,
+                    })
+                  }
                   required
                 />
               </div>
 
-              <div style={{ marginBottom: "10px" }}>
-                <label>Descripción:</label><br />
+              <div className="mb-3">
+                <label>Descripción</label>
                 <textarea
-                  value={nuevoArea.descripcion}
-                  onChange={(e) => setNuevoArea({ ...nuevoArea, descripcion: e.target.value })}
+                  className="form-control"
                   rows="3"
-                />
+                  value={nuevoArea.descripcion}
+                  onChange={(e) =>
+                    setNuevoArea({
+                      ...nuevoArea,
+                      descripcion: e.target.value,
+                    })
+                  }
+                ></textarea>
               </div>
 
-              {mensajeArea && <p>{mensajeArea}</p>}
+              {mensajeArea && (
+                <p className="text-danger">{mensajeArea}</p>
+              )}
 
-              <div style={{ textAlign: "right" }}>
-                <button type="button" onClick={cerrarModalCrear} disabled={guardandoArea}>
+              <div className="d-flex justify-content-end">
+                <button
+                  type="button"
+                  className="btn btn-secondary me-2"
+                  onClick={cerrarModalCrear}
+                  disabled={guardandoArea}
+                >
                   Cancelar
-                </button>{" "}
-                <button type="submit" disabled={guardandoArea}>
+                </button>
+
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  disabled={guardandoArea}
+                >
                   {guardandoArea ? "Guardando..." : "Guardar"}
                 </button>
               </div>
@@ -213,30 +283,9 @@ function Areas() {
           </div>
         </div>
       )}
+
     </div>
   );
 }
-
-const estiloFondoModal = {
-  position: "fixed",
-  top: 0,
-  left: 0,
-  right: 0,
-  bottom: 0,
-  backgroundColor: "rgba(0,0,0,0.6)",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  zIndex: 1000,
-};
-
-const estiloModal = {
-  background: "#fff",
-  padding: "20px",
-  borderRadius: "10px",
-  width: "400px",
-  maxHeight: "80vh",
-  overflowY: "auto",
-};
 
 export default Areas;
