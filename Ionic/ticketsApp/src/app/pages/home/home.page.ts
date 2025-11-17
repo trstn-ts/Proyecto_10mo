@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { IonicModule, NavController, MenuController } from '@ionic/angular';
 import { CommonModule, DatePipe } from '@angular/common';
 import axios from 'axios';
+import { AuthService } from '../../services/auth';
 
 @Component({
   selector: 'app-home',
@@ -13,16 +14,29 @@ import axios from 'axios';
 export class HomePage implements OnInit {
   tickets: any[] = [];
   ultimoTicket: any = null;
-  loading: boolean = true;
+  loading = true;
   error: string | null = null;
 
   constructor(
     private navCtrl: NavController,
-    private menuCtrl: MenuController
+    private menuCtrl: MenuController,
+    public authService: AuthService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   async ngOnInit() {
-    this.cargarTickets();
+    this.authService.cargarUsuario();
+
+    console.log('Rol detectado:', this.authService.getRol());
+
+    await this.cargarTickets();
+
+    this.cdr.detectChanges();
+  }
+
+  async ionViewWillEnter() {
+    this.authService.cargarUsuario();
+    this.cdr.detectChanges();
   }
 
   async cargarTickets() {
@@ -54,6 +68,7 @@ export class HomePage implements OnInit {
         'Error al cargar los tickets. Verifica que el backend esté funcionando.';
     } finally {
       this.loading = false;
+      this.cdr.detectChanges();
     }
   }
 
@@ -74,7 +89,7 @@ export class HomePage implements OnInit {
   }
 
   cerrarSesion() {
-    localStorage.clear();
-    this.navCtrl.navigateRoot('/login');
+    this.authService.cerrarSesion();
+    this.navCtrl.navigateRoot('/');
   }
 }
