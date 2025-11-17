@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from "react";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap-icons/font/bootstrap-icons.css";
+import "../usuarios/Usuarios.css"; 
 
 function Roles() {
   const [roles, setRoles] = useState([]);
@@ -8,8 +11,8 @@ function Roles() {
   const [usuarios, setUsuarios] = useState([]);
   const [rolSeleccionado, setRolSeleccionado] = useState(null);
   const [cargandoUsuarios, setCargandoUsuarios] = useState(false);
-  const [mostrandoModalUsuarios, setMostrandoModalUsuarios] = useState(false);  
-  
+  const [mostrandoModalUsuarios, setMostrandoModalUsuarios] = useState(false);
+
   useEffect(() => {
     const obtenerRoles = async () => {
       try {
@@ -25,11 +28,12 @@ function Roles() {
     };
     obtenerRoles();
   }, []);
-  
+
   const verUsuarios = async (rol) => {
     setRolSeleccionado(rol);
     setMostrandoModalUsuarios(true);
     setCargandoUsuarios(true);
+
     try {
       const res = await fetch(`http://localhost:3001/api/rolesUsuarios?id_rol=${rol.id_rol}`);
       if (!res.ok) throw new Error("Error al obtener usuarios");
@@ -49,53 +53,70 @@ function Roles() {
     setUsuarios([]);
   };
 
-  if (cargando) return <p>Cargando roles...</p>;
-  if (error) return <p style={{ color: "red" }}>{error}</p>;
+  if (cargando) return <p className="text-center mt-5">Cargando roles...</p>;
+  if (error) return <p className="text-danger text-center mt-5">{error}</p>;
 
   return (
-    <div>
-      <h2>Lista de Roles</h2>
-      <table border="1" cellPadding="10" style={{ borderCollapse: "collapse", width: "100%" }}>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Nombre</th>
-            <th>Descripción</th>
-            <th>Acciones</th>         
-          </tr>
-        </thead>
-        <tbody>
-          {roles.map((rol) => (
-            <tr key={rol.id_rol}>
-              <td>{rol.id_rol}</td>
-              <td>{rol.nombre_rol}</td>
-              <td>{rol.descripcion_rol}</td>
-              <td>                
-                <button onClick={() => verUsuarios(rol)}>Usuarios asignados</button>
-              </td>
+    <div className="container mt-4 usuarios-container">
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h2 className="text-dark">Lista de Roles</h2>
+      </div>
+
+      <div className="table-responsive shadow-sm rounded">
+        <table className="table table-hover align-middle">
+          <thead className="table-danger">
+            <tr>
+              <th>ID</th>
+              <th>Nombre</th>
+              <th>Descripción</th>
+              <th>Acciones</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+
+          <tbody>
+            {roles.map((rol) => (
+              <tr key={rol.id_rol}>
+                <td>{rol.id_rol}</td>
+                <td>{rol.nombre_rol}</td>
+                <td>{rol.descripcion_rol}</td>
+                <td>
+                  <button
+                    className="btn btn-outline-primary btn-sm"
+                    onClick={() => verUsuarios(rol)}
+                  >
+                    <i className="bi bi-people"></i> Ver usuarios
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       {/* --- Modal Usuarios Asignados --- */}
       {mostrandoModalUsuarios && (
-        <div style={estiloFondoModal}>
-          <div style={estiloModal}>
-            <h3>Usuarios con el rol: {rolSeleccionado?.nombre_rol}</h3>
+        <div className="custom-modal">
+          <div className="custom-modal-content">
+            <h4>Usuarios con el rol: {rolSeleccionado?.nombre_rol}</h4>
+
             {cargandoUsuarios ? (
-              <p>Cargando usuarios...</p>
+              <p className="text-center mt-3">Cargando usuarios...</p>
             ) : usuarios.length > 0 ? (
               <ul>
                 {usuarios.map((u) => (
-                  <li key={u.id_usuario}>{u.nombre_usuario || "(Sin nombre registrado)"}</li>
+                  <li key={u.id_usuario}>
+                    {u.nombre_usuario || "(Sin nombre registrado)"}
+                  </li>
                 ))}
               </ul>
             ) : (
-              <p>No hay usuarios asignados a este rol.</p>
+              <p className="text-center mt-3">No hay usuarios asignados a este rol.</p>
             )}
-            <div style={{ marginTop: "15px", textAlign: "right" }}>
-              <button onClick={cerrarModalUsuarios}>Cerrar</button>
+
+            <div className="d-flex justify-content-end mt-3">
+              <button className="btn btn-secondary" onClick={cerrarModalUsuarios}>
+                Cerrar
+              </button>
             </div>
           </div>
         </div>
@@ -103,27 +124,5 @@ function Roles() {
     </div>
   );
 }
-
-const estiloFondoModal = {
-  position: "fixed",
-  top: 0,
-  left: 0,
-  right: 0,
-  bottom: 0,
-  backgroundColor: "rgba(0,0,0,0.6)",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  zIndex: 1000,
-};
-
-const estiloModal = {
-  background: "#fff",
-  padding: "20px",
-  borderRadius: "10px",
-  width: "400px",
-  maxHeight: "80vh",
-  overflowY: "auto",
-};
 
 export default Roles;
