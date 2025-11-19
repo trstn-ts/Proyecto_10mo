@@ -32,7 +32,7 @@ export class TicketUpPage {
         return;
       }
 
-      await axios.post('http://localhost:3000/api/tickets', {
+      await axios.post('http://localhost:3000/movil/tickets', {
         id_usuario: usuario.id,
         id_area: usuario.area,
         titulo: this.titulo,

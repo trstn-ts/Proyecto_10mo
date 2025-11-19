@@ -55,7 +55,7 @@ export class HomePage implements OnInit {
 
     try {
       const response = await axios.get(
-        `http://localhost:3000/api/tickets/usuario/${idUsuario}`
+        `http://localhost:3000/movil/tickets/usuario/${idUsuario}`
       );
 
       this.tickets = response.data;
