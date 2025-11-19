@@ -29,7 +29,7 @@ const dbConfig = {
   requestTimeout: 30000,
 };
 
-
+//IA para clasificar prioridad
 async function clasificarPrioridadIA(descripcion) {
   const RECHAZO_NO_TECNICO = "Entrada inválida";
 
@@ -54,31 +54,32 @@ Si la entrada NO es técnica, responde exactamente con: ${RECHAZO_NO_TECNICO}.`,
     });
 
     let respuesta = completion.choices[0].message.content
-  .trim()
-  .replace(/[<>\[\]{}|\\/_.,;:!¡¿?'"`*~^%$#@-]/g, '')
-  .replace(/\s+/g, '') 
-  .toLowerCase(); 
+      .trim()
+      .replace(/[<>\[\]{}|\\/_.,;:!¡¿?'"`*~^%$#@-]/g, "")
+      .replace(/\s+/g, "")
+      .toLowerCase();
 
-if (respuesta.includes('alta')) respuesta = 'Alta';
-else if (respuesta.includes('media')) respuesta = 'Media';
-else if (respuesta.includes('baja')) respuesta = 'Baja';
-else if (respuesta.includes(RECHAZO_NO_TECNICO.toLowerCase())) respuesta = 'Baja';
-else respuesta = 'Baja';
+    if (respuesta.includes("alta")) respuesta = "Alta";
+    else if (respuesta.includes("media")) respuesta = "Media";
+    else if (respuesta.includes("baja")) respuesta = "Baja";
+    else if (respuesta.includes(RECHAZO_NO_TECNICO.toLowerCase())) respuesta = "Baja";
+    else respuesta = "Baja";
 
-return respuesta;
+    return respuesta;
   } catch (err) {
     console.error("Error al clasificar con IA:", err.message);
-    return "Baja"; 
+    return "Baja";
   }
 }
 
 
 app.get("/", (req, res) => {
-  res.send("API de Tickets corriendo correctamente");
+  res.send("API móvil de Tickets corriendo correctamente");
 });
 
 
-app.post("/api/login", async (req, res) => {
+//Login
+app.post("/movil/login", async (req, res) => {
   const { usuario, contrasena } = req.body;
 
   if (!usuario || !contrasena) {
@@ -129,7 +130,8 @@ app.post("/api/login", async (req, res) => {
 });
 
 
-app.get("/api/tickets/usuario/:idUsuario", async (req, res) => {
+//Tickets por usuario
+app.get("/movil/tickets/usuario/:idUsuario", async (req, res) => {
   const { idUsuario } = req.params;
 
   try {
@@ -157,7 +159,8 @@ app.get("/api/tickets/usuario/:idUsuario", async (req, res) => {
 });
 
 
-app.post("/api/tickets", async (req, res) => {
+//Levantar tickets
+app.post("/movil/tickets", async (req, res) => {
   const { id_usuario, id_area, titulo, descripcion_problema } = req.body;
 
   if (!id_usuario || !id_area || !titulo || !descripcion_problema) {
@@ -169,9 +172,7 @@ app.post("/api/tickets", async (req, res) => {
     console.log(`Prioridad sugerida por IA: ${prioridadIA}`);
 
     const prioridadesValidas = ["Alta", "Media", "Baja"];
-    if (!prioridadesValidas.includes(prioridadIA)) {
-      prioridadIA = "Baja"; 
-    }
+    if (!prioridadesValidas.includes(prioridadIA)) prioridadIA = "Baja";
 
     const pool = await sql.connect(dbConfig);
     await pool.request()
@@ -196,12 +197,15 @@ app.post("/api/tickets", async (req, res) => {
 });
 
 
-
-app.get("/test-db", async (req, res) => {
+//COnexion
+app.get("/movil/test-db", async (req, res) => {
   try {
     const pool = await sql.connect(dbConfig);
     const result = await pool.request().query("SELECT GETDATE() AS fecha");
-    res.json({ conexion: "exitosa", fecha_servidor: result.recordset[0].fecha });
+    res.json({
+      conexion: "exitosa",
+      fecha_servidor: result.recordset[0].fecha,
+    });
   } catch (err) {
     console.error("Error de conexión:", err);
     res.status(500).json({
@@ -211,7 +215,7 @@ app.get("/test-db", async (req, res) => {
   }
 });
 
-//
-//
+
+// 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Servidor corriendo en puerto ${PORT}`));
