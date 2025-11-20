@@ -16,7 +16,7 @@ function Roles() {
   useEffect(() => {
     const obtenerRoles = async () => {
       try {
-        const respuesta = await fetch("http://localhost:3001/api/roles");
+        const respuesta = await fetch("http://localhost:3001/web/roles");
         if (!respuesta.ok) throw new Error("Error al obtener roles");
         const datos = await respuesta.json();
         setRoles(datos);
@@ -35,7 +35,7 @@ function Roles() {
     setCargandoUsuarios(true);
 
     try {
-      const res = await fetch(`http://localhost:3001/api/rolesUsuarios?id_rol=${rol.id_rol}`);
+      const res = await fetch(`http://localhost:3001/web/rolesUsuarios?id_rol=${rol.id_rol}`);
       if (!res.ok) throw new Error("Error al obtener usuarios");
       const datos = await res.json();
       setUsuarios(datos);

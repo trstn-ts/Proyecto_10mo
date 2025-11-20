@@ -24,7 +24,7 @@ function Areas() {
   useEffect(() => {
     const obtenerAreas = async () => {
       try {
-        const res = await fetch("http://localhost:3001/api/areas");
+        const res = await fetch("http://localhost:3001/web/areas");
         if (!res.ok) throw new Error("Error al obtener áreas");
         const datos = await res.json();
         setAreas(datos);
@@ -45,7 +45,7 @@ function Areas() {
 
     try {
       const res = await fetch(
-        `http://localhost:3001/api/areasUsuarios?id_area=${area.id_area}`
+        `http://localhost:3001/web/areasUsuarios?id_area=${area.id_area}`
       );
       if (!res.ok) throw new Error("Error al obtener usuarios");
       const datos = await res.json();
@@ -63,7 +63,7 @@ function Areas() {
 
     try {
       const res = await fetch(
-        `http://localhost:3001/api/areas/${id_area}`,
+        `http://localhost:3001/web/areas/${id_area}`,
         { method: "DELETE" }
       );
       const data = await res.json();
@@ -93,7 +93,7 @@ function Areas() {
     setMensajeArea("");
 
     try {
-      const res = await fetch("http://localhost:3001/api/areaNuevo", {
+      const res = await fetch("http://localhost:3001/web/areaNuevo", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(nuevoArea),
@@ -103,7 +103,7 @@ function Areas() {
 
       if (data.success) {
         alert("Área creada correctamente");
-        const resAreas = await fetch("http://localhost:3001/api/areas");
+        const resAreas = await fetch("http://localhost:3001/web/areas");
         const nuevasAreas = await resAreas.json();
         setAreas(nuevasAreas);
         cerrarModalCrear();

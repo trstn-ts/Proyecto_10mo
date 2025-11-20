@@ -41,6 +41,7 @@ function Layout({ setAutenticado }) {
             </li>
             <li>
               <NavLink to="/tickets" activeclassname="activo">Tickets</NavLink>
+              <NavLink to="/tickets-cerrados" activeclassname="activo">Tickets Cerrados</NavLink>
               <NavLink to="/tickets-sin-asignar" activeclassname="activo">
                 Tickets Sin Asignar
               </NavLink>

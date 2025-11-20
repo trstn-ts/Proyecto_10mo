@@ -31,7 +31,7 @@ function Usuarios() {
   useEffect(() => {
     const obtenerUsuarios = async () => {
       try {
-        const res = await fetch("http://localhost:3001/api/usuarios");
+        const res = await fetch("http://localhost:3001/web/usuarios");
         if (!res.ok) throw new Error("Error al obtener usuarios");
         const datos = await res.json();
         setUsuarios(datos);
@@ -47,7 +47,7 @@ function Usuarios() {
   useEffect(() => {
     const cargarRoles = async () => {
       try {
-        const res = await fetch("http://localhost:3001/api/roles");
+        const res = await fetch("http://localhost:3001/web/roles");
         const datos = await res.json();
         setRoles(datos);
       } catch (err) {
@@ -56,7 +56,7 @@ function Usuarios() {
     };
     const cargarAreas = async () => {
       try {
-        const res = await fetch("http://localhost:3001/api/areas");
+        const res = await fetch("http://localhost:3001/web/areas");
         const datos = await res.json();
         setAreas(datos);
       } catch (err) {
@@ -110,7 +110,7 @@ function Usuarios() {
     setMensaje("");
 
     try {
-      const res = await fetch("http://localhost:3001/api/usuariosNuevo", {
+      const res = await fetch("http://localhost:3001/web/usuariosNuevo", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(nuevoUsuario),
@@ -119,7 +119,7 @@ function Usuarios() {
 
       if (data.success) {
         alert("Usuario creado correctamente");
-        const resUsuarios = await fetch("http://localhost:3001/api/usuarios");
+        const resUsuarios = await fetch("http://localhost:3001/web/usuarios");
         const usuariosActualizados = await resUsuarios.json();
         setUsuarios(usuariosActualizados);
         cerrarModal();
@@ -145,7 +145,7 @@ function Usuarios() {
     }
 
     try {
-      const res = await fetch(`http://localhost:3001/api/usuariosActualizar/${id_usuario}`, {
+      const res = await fetch(`http://localhost:3001/web/usuariosActualizar/${id_usuario}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ nombre, apellido, correo, telefono, usuario, password, id_rol, id_area }),
@@ -158,7 +158,7 @@ function Usuarios() {
       }
 
       alert(data.message);
-      const resUsuarios = await fetch("http://localhost:3001/api/usuarios");
+      const resUsuarios = await fetch("http://localhost:3001/web/usuarios");
       const usuariosActualizados = await resUsuarios.json();
       setUsuarios(usuariosActualizados);
       cerrarModalEditar();
@@ -172,7 +172,7 @@ function Usuarios() {
     if (!window.confirm("¿Seguro que deseas eliminar este usuario?")) return;
 
     try {
-      const res = await fetch(`http://localhost:3001/api/usuarios/${id_usuario}`, {
+      const res = await fetch(`http://localhost:3001/web/usuarios/${id_usuario}`, {
         method: "DELETE",
       });
       const data = await res.json();

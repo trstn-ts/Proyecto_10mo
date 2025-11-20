@@ -13,10 +13,21 @@ function Tickets() {
   const [prioridad, setPrioridad] = useState("");
   const [mostrandoModal, setMostrandoModal] = useState(false);
 
+  const formatearFecha = (fecha) => {
+    if (!fecha) return "";
+    return new Intl.DateTimeFormat("es-MX", {
+      year: "numeric",
+      month: "long",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit"
+    }).format(new Date(fecha));
+  };
+
   useEffect(() => {
     const obtenerTickets = async () => {
       try {
-        const respuesta = await fetch("http://localhost:3001/api/ticketsSinAsignar");
+        const respuesta = await fetch("http://localhost:3001/web/ticketsSinAsignar");
         if (!respuesta.ok) throw new Error("Error al obtener tickets");
         const datos = await respuesta.json();
         setTickets(datos);
@@ -32,7 +43,7 @@ function Tickets() {
   useEffect(() => {
     const obtenerTecnicos = async () => {
       try {
-        const res = await fetch("http://localhost:3001/api/tecnicos");
+        const res = await fetch("http://localhost:3001/web/tecnicos");
         const datos = await res.json();
         setTecnicos(datos);
       } catch (err) {
@@ -45,7 +56,7 @@ function Tickets() {
   const abrirModal = (ticket) => {
     setTicketSeleccionado(ticket);
     setIdTecnico("");
-    setPrioridad("");
+    setPrioridad(ticket.prioridad || "");
     setMostrandoModal(true);
   };
 
@@ -61,7 +72,7 @@ function Tickets() {
     }
 
     try {
-      const respuesta = await fetch("http://localhost:3001/api/asignarTicket", {
+      const respuesta = await fetch("http://localhost:3001/web/asignarTicket", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -93,33 +104,46 @@ function Tickets() {
       <div className="table-responsive shadow-sm rounded mb-4">
         <table className="table table-hover align-middle">
           <thead className="table-danger">
-            <tr>
-              <th>ID</th>
-              <th>Usuario</th>
-              <th>Título</th>
-              <th>Fecha de Creación</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
+          <tr>
+            <th>ID</th>
+            <th>Usuario</th>
+            <th>Título</th>
+            <th>Fecha de Creación</th>
+            <th>Prioridad</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
 
-          <tbody>
-            {tickets.map((ticket) => (
-              <tr key={ticket.id_ticket}>
-                <td>{ticket.id_ticket}</td>
-                <td>{ticket.nombre_usuario}</td>
-                <td>{ticket.titulo}</td>
-                <td>{ticket.fecha_creacion}</td>
-                <td>
-                  <button
-                    className="btn btn-outline-primary btn-sm"
-                    onClick={() => abrirModal(ticket)}
-                  >
-                    <i className="bi bi-eye"></i> Detalles
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
+        <tbody>
+          {tickets.map((ticket) => (
+            <tr key={ticket.id_ticket}>
+              <td>{ticket.id_ticket}</td>
+              <td>{ticket.nombre_usuario}</td>
+              <td>{ticket.titulo}</td>
+              <td>{formatearFecha(ticket.fecha_creacion)}</td>
+              <td>
+                <span
+                  className={
+                    ticket.prioridad === "Alta" ? "badge bg-danger" :
+                    ticket.prioridad === "Media" ? "badge bg-warning text-dark" :
+                    "badge bg-success"
+                  }
+                >
+                  {ticket.prioridad}
+                </span>
+              </td>
+              <td>
+                <button
+                  className="btn btn-outline-primary btn-sm"
+                  onClick={() => abrirModal(ticket)}
+                >
+                  <i className="bi bi-eye"></i> Detalles
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+
 
         </table>
       </div>
@@ -136,6 +160,17 @@ function Tickets() {
             <p><strong>Título:</strong> {ticketSeleccionado.titulo}</p>
             <p><strong>Descripción:</strong> {ticketSeleccionado.descripcion_problema}</p>
             <p><strong>Fecha:</strong> {ticketSeleccionado.fecha_creacion}</p>
+            <p><strong>Prioridad asignada por IA:</strong>
+              <span
+                className={
+                  ticketSeleccionado.prioridad === "Alta" ? "badge bg-danger" :
+                  ticketSeleccionado.prioridad === "Media" ? "badge bg-warning text-dark" :
+                  "badge bg-success"
+                }
+              >
+                {ticketSeleccionado.prioridad}
+              </span>
+            </p>
 
             <div className="mt-3">
               <label className="form-label"><strong>Prioridad:</strong></label>

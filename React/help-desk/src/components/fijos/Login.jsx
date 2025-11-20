@@ -16,7 +16,7 @@ function Login({ setAutenticado }) {
     setError("");
 
     try {
-      const respuesta = await fetch("http://localhost:3001/api/login", {
+      const respuesta = await fetch("http://localhost:3001/web/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ usuario, password }),
