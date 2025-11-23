@@ -5,13 +5,11 @@ import "../usuarios/Usuarios.css";
 
 function Tickets() {
 
-  // --- ESTADOS ---
   const [ticketsProceso, setTicketsProceso] = useState([]);
   const [ticketsCancelado, setTicketsCancelado] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState("");
 
-  // Estado para el modal
   const [mostrandoModal, setMostrandoModal] = useState(false);
   const [ticketSeleccionado, setTicketSeleccionado] = useState(null);
 
@@ -43,14 +41,11 @@ function Tickets() {
     obtener("http://localhost:3001/web/ticketsEnProceso", setTicketsProceso);
     obtener("http://localhost:3001/web/ticketsCancelado", setTicketsCancelado);
   }, []);
-
-  // --- ABRIR MODAL ---
   const abrirModal = (ticket) => {
     setTicketSeleccionado(ticket);
     setMostrandoModal(true);
   };
 
-  // --- CERRAR MODAL ---
   const cerrarModal = () => {
     setMostrandoModal(false);
     setTicketSeleccionado(null);
@@ -61,10 +56,6 @@ function Tickets() {
 
   return (
     <div className="container mt-4 usuarios-container">
-
-      {/* ----------------------------- */}
-      {/*       TICKETS EN PROCESO      */}
-      {/* ----------------------------- */}
 
       <h2 className="text-dark mb-3">Tickets en Proceso</h2>
       <div className="table-responsive shadow-sm rounded mb-4">
@@ -114,11 +105,6 @@ function Tickets() {
           </tbody>
         </table>
       </div>
-
-      {/* ----------------------------- */}
-      {/*        TICKETS CANCELADOS      */}
-      {/* ----------------------------- */}
-
       <h2 className="text-dark mb-3">Tickets Cancelados</h2>
       <div className="table-responsive shadow-sm rounded mb-4">
         <table className="table table-hover align-middle">
@@ -153,11 +139,6 @@ function Tickets() {
           </tbody>
         </table>
       </div>
-
-      {/* ----------------------------- */}
-      {/*             MODAL              */}
-      {/* ----------------------------- */}
-
       {mostrandoModal && ticketSeleccionado && (
         <div className="custom-modal">
           <div className="custom-modal-content shadow-lg">

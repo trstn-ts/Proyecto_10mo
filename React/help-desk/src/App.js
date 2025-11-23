@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import Layout from "./components/fijos/Layout";
 import Login from "./components/fijos/Login";
@@ -12,6 +12,8 @@ import Areas from "./components/modulos/areas/Areas";
 import UsuariosInactivos from "./components/modulos/usuarios/UsuariosInactivos";
 
 import "bootstrap-icons/font/bootstrap-icons.css";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
 function App() {  
   const [autenticado, setAutenticado] = useState(() => {

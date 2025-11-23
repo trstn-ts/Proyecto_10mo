@@ -41,7 +41,7 @@ let poolPromise = sql.connect(dbConfig)
 
 // --- Endpoints ---
 // Login
-app.post("/api/login", async (req, res) => {
+app.post("/web/login", async (req, res) => {
   const { usuario, password } = req.body;
 
   if (!usuario || !password) {
@@ -87,7 +87,7 @@ app.post("/api/login", async (req, res) => {
 
 // ---- Usuarios ----
 // Todos los Usuarios (activos)
-app.get('/api/usuarios', async (req, res) => {
+app.get('/web/usuarios', async (req, res) => {
   try {
     const pool = await poolPromise;
     const result = await pool.request().query(`SELECT U.id_usuario, U.nombre, U.apellido, CONCAT(U.nombre, ' ', U.apellido) AS nombre_usuario, U.correo, U.telefono, U.usuario, U.id_rol, U.id_area, R.nombre_rol, A.nombre_area FROM tbl_usuarios AS U JOIN tbl_roles AS R ON U.id_rol = R.id_rol LEFT JOIN tbl_areas AS A ON U.id_area = A.id_area WHERE U.activo = 1;`);
@@ -99,7 +99,7 @@ app.get('/api/usuarios', async (req, res) => {
 });
 
 // Todos los Usuarios (inactivos)
-app.get('/api/usuariosInactivos', async (req, res) => {
+app.get('/web/usuariosInactivos', async (req, res) => {
   try {
     const pool = await poolPromise;
     const result = await pool.request().query(`SELECT U.id_usuario, CONCAT (U.nombre, ' ', U.apellido) AS nombre_usuario, U.correo, U.telefono, R.nombre_rol, A.nombre_area FROM tbl_usuarios AS U JOIN tbl_roles AS R ON U.id_rol = R.id_rol LEFT JOIN tbl_areas AS A ON U.id_area = A.id_area WHERE U.activo = 0;`);
@@ -111,7 +111,7 @@ app.get('/api/usuariosInactivos', async (req, res) => {
 });
 
 // Todos los Usuarios (activos e inactivos)
-app.get('/api/usuariosTodos', async (req, res) => {
+app.get('/web/usuariosTodos', async (req, res) => {
   try {
     const pool = await poolPromise;
     const result = await pool.request().query(`SELECT U.id_usuario, CONCAT (U.nombre, ' ', U.apellido) AS nombre_usuario, U.correo, U.telefono, R.nombre_rol, A.nombre_area FROM tbl_usuarios AS U JOIN tbl_roles AS R ON U.id_rol = R.id_rol LEFT JOIN tbl_areas AS A ON U.id_area = A.id_area;`);
@@ -123,7 +123,7 @@ app.get('/api/usuariosTodos', async (req, res) => {
 });
 
 // Tecnicos para asignar tickets
-app.get("/api/tecnicos", async (req, res) => {
+app.get("/web/tecnicos", async (req, res) => {
   try {
     const pool = await poolPromise;
     const result = await pool
@@ -138,7 +138,7 @@ app.get("/api/tecnicos", async (req, res) => {
 });
 
 // Nuevo usuario
-app.post('/api/usuariosNuevo', async (req, res) => {
+app.post('/web/usuariosNuevo', async (req, res) => {
   const { nombre, apellido, correo, telefono, usuario, password, id_rol, id_area } = req.body;
 
   if (!nombre || !apellido || !correo || !usuario || !password || !id_rol) {
@@ -171,7 +171,7 @@ app.post('/api/usuariosNuevo', async (req, res) => {
 });
 
 // Eliminar usuario (solo cambiamos el activo a 0)
-app.delete('/api/usuarios/:id_usuario', async (req, res) => {
+app.delete('/web/usuarios/:id_usuario', async (req, res) => {
   const { id_usuario } = req.params;
   try {
     const pool = await poolPromise;
@@ -196,7 +196,7 @@ app.delete('/api/usuarios/:id_usuario', async (req, res) => {
 });
 
 // Actualizar usuario
-app.put('/api/usuariosActualizar/:id_usuario', async (req, res) => {
+app.put('/web/usuariosActualizar/:id_usuario', async (req, res) => {
   const { id_usuario } = req.params;
   const { nombre, apellido, correo, telefono, usuario, password, id_rol, id_area } = req.body;
 
@@ -257,7 +257,7 @@ app.put('/api/usuariosActualizar/:id_usuario', async (req, res) => {
 });
 
 // Activar usuario inactivo
-app.put('/api/usuariosActivar/:id_usuario', async (req, res) => {
+app.put('/web/usuariosActivar/:id_usuario', async (req, res) => {
   const { id_usuario } = req.params;
 
   try {
@@ -285,7 +285,7 @@ app.put('/api/usuariosActivar/:id_usuario', async (req, res) => {
 
 // ---- Tickets ----
 // Todos los Tickets sin filtros
-app.get('/api/tickets', async (req, res) => {
+app.get('/web/tickets', async (req, res) => {
   try {
     const pool = await poolPromise;
     const result = await pool.request().query(`SELECT T.id_ticket, T.titulo, T.prioridad, T.estado, T.fecha_creacion, T.fecha_cierre, CONCAT(U.nombre, ' ', U.apellido) AS nombre_usuario, CONCAT(TE.nombre, ' ', TE.apellido) AS nombre_tecnico FROM tbl_tickets T INNER JOIN tbl_usuarios U ON T.id_usuario = U.id_usuario LEFT JOIN tbl_usuarios TE ON T.id_tecnico = TE.id_usuario;`);
@@ -297,7 +297,7 @@ app.get('/api/tickets', async (req, res) => {
 });
 
 // Todos los Tickets Cerrados
-app.get('/api/ticketsCerrado', async (req, res) => {
+app.get('/web/ticketsCerrado', async (req, res) => {
   try {
     const pool = await poolPromise;
     const result = await pool.request().query(`SELECT T.id_ticket, T.titulo, T.prioridad, T.estado, T.fecha_creacion, T.fecha_cierre, CONCAT(U.nombre, ' ', U.apellido) AS nombre_usuario, CONCAT(TE.nombre, ' ', TE.apellido) AS nombre_tecnico FROM tbl_tickets T INNER JOIN tbl_usuarios U ON T.id_usuario = U.id_usuario LEFT JOIN tbl_usuarios TE ON T.id_tecnico = TE.id_usuario WHERE T.estado = 'Cerrado';`);
@@ -309,10 +309,10 @@ app.get('/api/ticketsCerrado', async (req, res) => {
 });
 
 // Todos los Tickets En proceso
-app.get('/api/ticketsEnProceso', async (req, res) => {
+app.get('/web/ticketsEnProceso', async (req, res) => {
   try {
     const pool = await poolPromise;
-    const result = await pool.request().query(`SELECT T.id_ticket, T.titulo, T.descripcion_problema, T.prioridad, T.estado, T.fecha_creacion, CONCAT(U.nombre, ' ', U.apellido) AS nombre_usuario, CONCAT(TE.nombre, ' ', TE.apellido) AS nombre_tecnico FROM tbl_tickets T INNER JOIN tbl_usuarios U ON T.id_usuario = U.id_usuario LEFT JOIN tbl_usuarios TE ON T.id_tecnico = TE.id_usuario WHERE T.estado = 'En proceso';`);
+    const result = await pool.request().query(`SELECT T.id_ticket, T.titulo, T.descripcion_problema, T.prioridad, T.estado, T.fecha_creacion, CONCAT(U.nombre, ' ', U.apellido) AS nombre_usuario, CONCAT(TE.nombre, ' ', TE.apellido) AS nombre_tecnico FROM tbl_tickets T INNER JOIN tbl_usuarios U ON T.id_usuario = U.id_usuario LEFT JOIN tbl_usuarios TE ON T.id_tecnico = TE.id_usuario WHERE T.estado = 'En proceso' AND T.id_tecnico IS NOT NULL;`);
     res.json(result.recordset);
   } catch (err) {
     console.error(err);
@@ -320,9 +320,8 @@ app.get('/api/ticketsEnProceso', async (req, res) => {
   }
 });
 
-
 // Todos los Tickets Cancelados
-app.get('/api/ticketsCancelado', async (req, res) => {
+app.get('/web/ticketsCancelado', async (req, res) => {
   try {
     const pool = await poolPromise;
     const result = await pool.request().query(`SELECT T.id_ticket, T.titulo, T.estado, T.fecha_creacion, CONCAT(U.nombre, ' ', U.apellido) AS nombre_usuario FROM tbl_tickets T INNER JOIN tbl_usuarios U ON T.id_usuario = U.id_usuario LEFT JOIN tbl_usuarios TE ON T.id_tecnico = TE.id_usuario WHERE T.estado = 'Cancelado';`);
@@ -334,10 +333,10 @@ app.get('/api/ticketsCancelado', async (req, res) => {
 });
 
 // Tickets sin asignar a tecnico y prioridad
-app.get('/api/ticketsSinAsignar', async (req, res) => {
+app.get('/web/ticketsSinAsignar', async (req, res) => {
   try {
     const pool = await poolPromise;
-    const result = await pool.request().query(`SELECT T.id_ticket, T.titulo, T.prioridad, T.estado, T.fecha_creacion, T.fecha_cierre, CONCAT(U.nombre, ' ', U.apellido) AS nombre_usuario,  CONCAT(TE.nombre, ' ', TE.apellido) AS nombre_tecnico, T.descripcion_problema FROM tbl_tickets T INNER JOIN tbl_usuarios U ON T.id_usuario = U.id_usuario LEFT JOIN tbl_usuarios TE ON T.id_tecnico = TE.id_usuario WHERE T.id_tecnico IS NULL AND T.prioridad IS NULL AND T.estado = 'En proceso';`);
+    const result = await pool.request().query(`SELECT T.id_ticket, T.titulo, T.prioridad, T.estado, T.fecha_creacion, T.fecha_cierre, CONCAT(U.nombre, ' ', U.apellido) AS nombre_usuario,  CONCAT(TE.nombre, ' ', TE.apellido) AS nombre_tecnico, T.descripcion_problema FROM tbl_tickets T INNER JOIN tbl_usuarios U ON T.id_usuario = U.id_usuario LEFT JOIN tbl_usuarios TE ON T.id_tecnico = TE.id_usuario WHERE T.id_tecnico IS NULL AND T.estado = 'En proceso';`);
     res.json(result.recordset);
   } catch (err) {
     console.error(err);
@@ -346,7 +345,7 @@ app.get('/api/ticketsSinAsignar', async (req, res) => {
 });
 
 // Para el archivo TicketsSinAsignar.jsx. Asignar ticket a tecnico y prioridad
-app.put("/api/asignarTicket", async (req, res) => {
+app.put("/web/asignarTicket", async (req, res) => {
   const { id_ticket, id_tecnico, prioridad } = req.body;
 
   if (!id_ticket || !id_tecnico || !prioridad) {
@@ -371,7 +370,7 @@ app.put("/api/asignarTicket", async (req, res) => {
 
 // ---- Roles ----
 // Roles
-app.get('/api/roles', async (req, res) => {
+app.get('/web/roles', async (req, res) => {
   try {
     const pool = await poolPromise;
     const result = await pool.request().query(`SELECT * FROM tbl_roles;`);
@@ -383,7 +382,7 @@ app.get('/api/roles', async (req, res) => {
 });
 
 // Usuarios por Roles
-app.get('/api/rolesUsuarios', async (req, res) => {
+app.get('/web/rolesUsuarios', async (req, res) => {
   const { id_rol } = req.query;
   if (!id_rol) {
     return res.status(400).json({ success: false, message: "Falta el id del rol" });
@@ -401,7 +400,7 @@ app.get('/api/rolesUsuarios', async (req, res) => {
 });
 
 // Nuevo Rol
-app.post('/api/rolesNuevo', async (req, res) => {
+app.post('/web/rolesNuevo', async (req, res) => {
   const { nombre_rol, descripcion } = req.body;
   if (!nombre_rol) {
     return res.status(400).json({ success: false, message: "El nombre del rol es obligatorio" });
@@ -424,7 +423,7 @@ app.post('/api/rolesNuevo', async (req, res) => {
 });
 
 // Eliminar rol
-app.delete('/api/roles/:id_rol', async (req, res) => {
+app.delete('/web/roles/:id_rol', async (req, res) => {
   const { id_rol } = req.params;
   try {
     const pool = await poolPromise;    
@@ -457,7 +456,7 @@ app.delete('/api/roles/:id_rol', async (req, res) => {
 
 // ---- Areas ----
 // Areas
-app.get('/api/areas', async (req, res) => {
+app.get('/web/areas', async (req, res) => {
   try {
     const pool = await poolPromise;
     const result = await pool.request().query(`SELECT * FROM tbl_areas;`);
@@ -469,7 +468,7 @@ app.get('/api/areas', async (req, res) => {
 });
 
 // Usuarios por Area
-app.get('/api/areasUsuarios', async (req, res) => {
+app.get('/web/areasUsuarios', async (req, res) => {
   const { id_area } = req.query;
   if (!id_area) {
     return res.status(400).json({ success: false, message: "Falta el id del area" });
@@ -487,7 +486,7 @@ app.get('/api/areasUsuarios', async (req, res) => {
 });
 
 // Nuevo Area
-app.post('/api/areaNuevo', async (req, res) => {
+app.post('/web/areaNuevo', async (req, res) => {
   const { nombre_area, descripcion } = req.body;
   if (!nombre_area) {
     return res.status(400).json({ success: false, message: "El nombre del area es obligatorio" });
@@ -510,7 +509,7 @@ app.post('/api/areaNuevo', async (req, res) => {
 });
 
 // Eliminar area
-app.delete('/api/areas/:id_area', async (req, res) => {
+app.delete('/web/areas/:id_area', async (req, res) => {
   const { id_area } = req.params;
   try {
     const pool = await poolPromise;
@@ -539,6 +538,136 @@ app.delete('/api/areas/:id_area', async (req, res) => {
     });
   }
 });
+
+//Evaluaciones de tickets
+app.get("/web/evaluaciones/:id_ticket", async (req, res) => {
+  const { id_ticket } = req.params;
+
+  try {
+    const pool = await poolPromise;
+    const result = await pool.request()
+      .input("id_ticket", sql.Int, id_ticket)
+      .query(`
+        SELECT E.id_evaluacion, E.calificacion, E.comentario, E.fecha_evaluacion,
+               CONCAT(U.nombre, ' ', U.apellido) AS nombre_evaluador,
+               E.rol_evaluador
+        FROM tbl_evaluaciones E
+        INNER JOIN tbl_usuarios U ON E.id_usuario = U.id_usuario
+        WHERE E.id_ticket = @id_ticket
+      `);
+
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("Error al obtener evaluaciones:", err);
+    res.status(500).json({ success: false, message: "Error interno del servidor" });
+  }
+});
+
+app.get("/web/ticketsConEvaluacion", async (req, res) => {
+  try {
+    const pool = await poolPromise;
+    const result = await pool.request().query(`
+      SELECT 
+        T.id_ticket,
+        T.titulo,
+        T.estado,
+        T.prioridad,
+        T.fecha_creacion,
+        CONCAT(U.nombre, ' ', U.apellido) AS nombre_usuario,
+        CONCAT(TE.nombre, ' ', TE.apellido) AS nombre_tecnico,
+        (SELECT AVG(calificacion) 
+         FROM tbl_evaluaciones 
+         WHERE id_ticket = T.id_ticket) AS calificacion_promedio
+      FROM tbl_tickets T
+      INNER JOIN tbl_usuarios U ON T.id_usuario = U.id_usuario
+      LEFT JOIN tbl_usuarios TE ON T.id_tecnico = TE.id_usuario
+    `);
+
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("Error listando tickets con evaluación:", err);
+    res.status(500).json({ success: false, message: "Error en el servidor" });
+  }
+});
+
+app.get("/web/statsTecnicos", async (req, res) => {
+  try {
+    const pool = await poolPromise;
+    const result = await pool.request().query(`
+      SELECT 
+        u.id_usuario,
+        u.nombre,
+        u.apellido,
+        u.usuario,
+        u.correo,
+        u.telefono,
+        u.fecha_registro,
+        r.nombre_rol AS rol,
+
+        -- tickets resueltos por el técnico
+        (SELECT COUNT(*) 
+         FROM tbl_tickets t 
+         WHERE t.id_tecnico = u.id_usuario 
+           AND t.estado = 'Cerrado') AS tickets_resueltos,
+
+        -- calificación que le dieron los usuarios al técnico
+        (SELECT AVG(ev.calificacion)
+         FROM tbl_evaluaciones ev
+         JOIN tbl_tickets t ON ev.id_ticket = t.id_ticket
+         WHERE t.id_tecnico = u.id_usuario
+           AND ev.rol_evaluador = 'Usuario') AS calificacion_promedio
+
+      FROM tbl_usuarios u
+      INNER JOIN tbl_roles r ON u.id_rol = r.id_rol
+      WHERE u.id_rol = 2; -- solo técnicos
+    `);
+
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("Error en statsTecnicos:", err);
+    res.status(500).send("Error en statsTecnicos");
+  }
+});
+
+app.get("/web/statsUsuarios", async (req, res) => {
+  try {
+    const pool = await poolPromise;
+    const result = await pool.request().query(`
+      SELECT 
+        u.id_usuario,
+        u.nombre,
+        u.apellido,
+        u.usuario,
+        u.correo,
+        u.telefono,
+        u.fecha_registro,
+        r.nombre_rol AS rol,
+
+        -- tickets que creó el usuario
+        (SELECT COUNT(*) FROM tbl_tickets t WHERE t.id_usuario = u.id_usuario) AS tickets_creados,
+
+        -- promedio de calificación que el técnico le dio al usuario
+        (SELECT AVG(ev.calificacion)
+         FROM tbl_evaluaciones ev
+         JOIN tbl_tickets t ON ev.id_ticket = t.id_ticket
+         WHERE t.id_usuario = u.id_usuario
+           AND ev.rol_evaluador = 'Tecnico') AS calificacion_promedio
+
+      FROM tbl_usuarios u
+      INNER JOIN tbl_roles r ON u.id_rol = r.id_rol
+      WHERE u.id_rol = 3; -- solo usuarios
+    `);
+
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("Error en statsUsuarios:", err);
+    res.status(500).send("Error en statsUsuarios");
+  }
+});
+
+
+
+
 
 app.listen(port, () => {
     console.log(`API corriendo en http://localhost:${port}`);

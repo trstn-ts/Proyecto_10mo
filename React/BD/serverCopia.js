@@ -533,6 +533,133 @@ app.delete('/web/areas/:id_area', async (req, res) => {
   }
 });
 
+
+//Evaluaciones de tickets
+app.get("/web/evaluaciones/:id_ticket", async (req, res) => {
+  const { id_ticket } = req.params;
+
+  try {
+    const pool = await poolPromise;
+    const result = await pool.request()
+      .input("id_ticket", sql.Int, id_ticket)
+      .query(`
+        SELECT E.id_evaluacion, E.calificacion, E.comentario, E.fecha_evaluacion,
+               CONCAT(U.nombre, ' ', U.apellido) AS nombre_evaluador,
+               E.rol_evaluador
+        FROM tbl_evaluaciones E
+        INNER JOIN tbl_usuarios U ON E.id_usuario = U.id_usuario
+        WHERE E.id_ticket = @id_ticket
+      `);
+
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("Error al obtener evaluaciones:", err);
+    res.status(500).json({ success: false, message: "Error interno del servidor" });
+  }
+});
+
+app.get("/web/ticketsConEvaluacion", async (req, res) => {
+  try {
+    const pool = await poolPromise;
+    const result = await pool.request().query(`
+      SELECT 
+        T.id_ticket,
+        T.titulo,
+        T.estado,
+        T.prioridad,
+        T.fecha_creacion,
+        CONCAT(U.nombre, ' ', U.apellido) AS nombre_usuario,
+        CONCAT(TE.nombre, ' ', TE.apellido) AS nombre_tecnico,
+        (SELECT AVG(calificacion) 
+         FROM tbl_evaluaciones 
+         WHERE id_ticket = T.id_ticket) AS calificacion_promedio
+      FROM tbl_tickets T
+      INNER JOIN tbl_usuarios U ON T.id_usuario = U.id_usuario
+      LEFT JOIN tbl_usuarios TE ON T.id_tecnico = TE.id_usuario
+    `);
+
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("Error listando tickets con evaluación:", err);
+    res.status(500).json({ success: false, message: "Error en el servidor" });
+  }
+});
+
+app.get("/web/statsTecnicos", async (req, res) => {
+  try {
+    const pool = await poolPromise;
+    const result = await pool.request().query(`
+      SELECT 
+        u.id_usuario,
+        u.nombre,
+        u.apellido,
+        u.usuario,
+        u.correo,
+        u.telefono,
+        u.fecha_registro,
+        r.nombre_rol AS rol,
+
+        -- tickets resueltos por el técnico
+        (SELECT COUNT(*) 
+         FROM tbl_tickets t 
+         WHERE t.id_tecnico = u.id_usuario 
+           AND t.estado = 'Cerrado') AS tickets_resueltos,
+
+        -- calificación que le dieron los usuarios al técnico
+        (SELECT AVG(ev.calificacion)
+         FROM tbl_evaluaciones ev
+         JOIN tbl_tickets t ON ev.id_ticket = t.id_ticket
+         WHERE t.id_tecnico = u.id_usuario
+           AND ev.rol_evaluador = 'Usuario') AS calificacion_promedio
+
+      FROM tbl_usuarios u
+      INNER JOIN tbl_roles r ON u.id_rol = r.id_rol
+      WHERE u.id_rol = 2; -- solo técnicos
+    `);
+
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("Error en statsTecnicos:", err);
+    res.status(500).send("Error en statsTecnicos");
+  }
+});
+
+app.get("/web/statsUsuarios", async (req, res) => {
+  try {
+    const pool = await poolPromise;
+    const result = await pool.request().query(`
+      SELECT 
+        u.id_usuario,
+        u.nombre,
+        u.apellido,
+        u.usuario,
+        u.correo,
+        u.telefono,
+        u.fecha_registro,
+        r.nombre_rol AS rol,
+
+        -- tickets que creó el usuario
+        (SELECT COUNT(*) FROM tbl_tickets t WHERE t.id_usuario = u.id_usuario) AS tickets_creados,
+
+        -- promedio de calificación que el técnico le dio al usuario
+        (SELECT AVG(ev.calificacion)
+         FROM tbl_evaluaciones ev
+         JOIN tbl_tickets t ON ev.id_ticket = t.id_ticket
+         WHERE t.id_usuario = u.id_usuario
+           AND ev.rol_evaluador = 'Tecnico') AS calificacion_promedio
+
+      FROM tbl_usuarios u
+      INNER JOIN tbl_roles r ON u.id_rol = r.id_rol
+      WHERE u.id_rol = 3; -- solo usuarios
+    `);
+
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("Error en statsUsuarios:", err);
+    res.status(500).send("Error en statsUsuarios");
+  }
+});
+
 app.listen(port, () => {
-    console.log(`web corriendo en http://localhost:${port}`);
+    console.log(`API corriendo en http://localhost:${port}`);
 });
