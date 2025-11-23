@@ -1,22 +1,24 @@
-/* Contenedor general */
 .layout {
   display: flex;
   min-height: 100vh;
   flex-direction: row;
   font-family: "Poppins", sans-serif;
+  background-color: var(--color-bg);
 }
 
-/* --- Header --- */
 .header {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 65px;
-  background-color: #c60000;
+  background-color: var(--color-primary);
   color: white;
   padding: 0 25px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--shadow-sm);
   z-index: 1000;
 }
 
@@ -26,33 +28,33 @@
   letter-spacing: 1px;
 }
 
-/* Botón de cerrar sesión */
 .logout-btn {
-  background-color: #a00000 !important;
+  background-color: var(--color-primary-dark) !important;
   border: none;
   font-weight: 600;
   padding: 8px 16px;
-  border-radius: 6px;
-  transition: all 0.3s ease;
+  border-radius: var(--radius-sm);
+  transition: var(--transition-base);
+  color: white;
 }
 
 .logout-btn:hover {
-  background-color: #850000 !important;
+  background-color: var(--color-primary-darker) !important;
   transform: translateY(-2px);
 }
 
-/* --- Sidebar --- */
 .sidebar {
   position: fixed;
   top: 65px;
   left: 0;
   width: 230px;
   height: calc(100% - 65px);
-  background-color: #a00000;
+  background-color: var(--color-primary-dark);
   color: #fff;
   padding: 25px 15px;
   box-sizing: border-box;
-  transition: width 0.3s ease;
+  transition: width var(--transition-base);
+  overflow-y: auto;
 }
 
 .sidebar:hover {
@@ -62,43 +64,62 @@
 .sidebar ul {
   list-style: none;
   padding: 0;
+  margin: 0;
 }
 
 .sidebar ul li {
   margin-bottom: 12px;
 }
 
-/* Enlaces del menú */
 .sidebar ul li a {
   color: #fff;
   text-decoration: none;
   font-size: 16px;
   display: block;
-  padding: 10px 14px;
-  border-radius: 6px;
-  transition: all 0.3s ease;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  transition: var(--transition-fast);
 }
 
 .sidebar ul li a:hover {
-  background-color: #c60000;
-  transform: translateX(5px);
+  background-color: var(--color-primary);
+  transform: translateX(4px);
 }
 
-/* Enlace activo */
 .sidebar ul li a.activo {
-  background-color: #c60000;
+  background-color: var(--color-primary);
   font-weight: 600;
-  box-shadow: inset 4px 0 0 #fff;
+  box-shadow: inset 4px 0 0 var(--color-white);
 }
 
-/* --- Contenido principal --- */
 .main-content {
   margin-left: 230px;
   margin-top: 65px;
   padding: 25px;
   flex: 1;
-  background-color: #f9f9f9;
+  background-color: var(--color-bg);
   min-height: calc(100vh - 65px);
-  transition: margin-left 0.3s ease;
+  transition: margin-left var(--transition-base);
 }
 
+.noti-icon {
+  cursor: pointer;
+  color: white;
+}
+
+.noti-icon:hover {
+  opacity: 0.8;
+}
+
+.noti-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: #ff3b3b;
+  color: #fff;
+  padding: 2px 6px;
+  font-size: 12px;
+  border-radius: 50%;
+  font-weight: bold;
+  box-shadow: 0 0 4px rgba(0,0,0,0.3);
+}

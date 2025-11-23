@@ -1,18 +1,99 @@
+/* =======================================================
+   CONTENEDOR GENERAL
+======================================================= */
+.dashboard-container {
+  padding: 20px;
+}
+
+/* =======================================================
+   TÍTULOS
+======================================================= */
+.titulo-pagina {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  margin-bottom: var(--spacing-lg);
+  color: var(--color-primary-darker);
+}
+
+.subtitulo {
+  margin-top: 30px;
+  margin-bottom: 10px;
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+/* =======================================================
+   GRID DE ESTADÍSTICAS GENERALES
+======================================================= */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); 
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+}
+
+
+/* Tarjeta general */
+.stat-card {
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: var(--spacing-md);
+  text-align: center;
+  font-weight: 600;
+  transition: var(--transition-fast);
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Título dentro de la tarjeta */
+.stat-card h4 {
+  margin: 0 0 6px 0;
+  font-size: var(--font-size-base);
+  color: var(--color-primary-dark);
+  font-weight: 700;
+}
+
+/* Valor numérico */
+.stat-card p {
+  margin: 0;
+  font-size: var(--font-size-xl);
+  color: var(--color-text);
+  font-weight: 700;
+}
+
+/* =======================================================
+   TARJETAS DE USUARIOS Y TÉCNICOS
+======================================================= */
 .cards-container {
   display: flex;
   flex-wrap: wrap;
-  gap: 15px;
+  gap: 16px;
 }
 
-.card {
-  padding: 15px;
-  background: #fff;
-  border-radius: 10px;
-  min-width: 200px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+.user-card {
+  min-width: 230px;
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: var(--spacing-md);
 }
 
-.card h5 {
+.user-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.user-card h5 {
   margin-bottom: 10px;
-  color: #333;
+  font-weight: 700;
+  color: var(--color-primary-darker);
+}
+
+.user-card p {
+  margin: 5px 0;
 }

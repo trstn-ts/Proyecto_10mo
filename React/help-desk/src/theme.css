@@ -1,0 +1,122 @@
+:root {
+  --color-primary: #c60000; 
+  --color-primary-dark: #a00000;
+  --color-primary-darker: #850000;
+
+  --color-bg: #f9f9f9; 
+  --color-white: #ffffff; 
+  --color-black: #000000;
+
+  --color-text: #333333; 
+  --color-text-light: #555555;   
+  --color-border: #dddddd;       
+  --color-shadow: rgba(0, 0, 0, 0.15);
+
+  --color-success: #28a745;
+  --color-warning: #ffc107;
+  --color-danger: #dc3545;
+  --color-info: #17a2b8;
+
+  --color-surface: #ffffff;
+  --color-surface-alt: #f0f0f0;
+
+  --font-primary: "Poppins", sans-serif;
+  --font-size-base: 16px;
+  --font-size-sm: 14px;
+  --font-size-lg: 18px;
+  --font-size-xl: 22px;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+
+  --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.10);
+  --shadow-md: 0 4px 10px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 6px 18px rgba(0, 0, 0, 0.20);
+
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.3s ease;
+  --transition-slow: 0.45s ease;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-primary);
+  font-size: var(--font-size-base);
+  margin: 0;
+}
+
+button,
+input,
+textarea,
+select {
+  outline: none !important;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-primary);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-track {
+  background: #eee;
+}
+
+.card-theme {
+  background-color: var(--color-surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: var(--spacing-md);
+}
+
+.btn-theme {
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  transition: var(--transition-base);
+  cursor: pointer;
+}
+
+.btn-theme:hover {
+  background-color: var(--color-primary-dark);
+}
+
+.input-theme {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--spacing-sm);
+  font-size: var(--font-size-base);
+  transition: var(--transition-fast);
+}
+
+.input-theme:focus {
+  border-color: var(--color-primary);
+}
+
+.modal-theme {
+  background-color: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-lg);
+}
+
+.sidebar-theme {
+  background-color: var(--color-primary-dark);
+}
+
+.header-theme {
+  background-color: var(--color-primary);
+}
+

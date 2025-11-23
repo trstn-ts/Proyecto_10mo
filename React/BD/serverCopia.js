@@ -614,7 +614,7 @@ app.get("/web/statsTecnicos", async (req, res) => {
 
       FROM tbl_usuarios u
       INNER JOIN tbl_roles r ON u.id_rol = r.id_rol
-      WHERE u.id_rol = 2; -- solo técnicos
+      WHERE u.id_rol = 2 AND u.activo = 1; -- solo técnicos
     `);
 
     res.json(result.recordset);
@@ -650,7 +650,7 @@ app.get("/web/statsUsuarios", async (req, res) => {
 
       FROM tbl_usuarios u
       INNER JOIN tbl_roles r ON u.id_rol = r.id_rol
-      WHERE u.id_rol = 3; -- solo usuarios
+      WHERE u.id_rol = 3  AND u.activo = 1; -- solo usuarios
     `);
 
     res.json(result.recordset);

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-
+import "./Inicio.css"; 
 export default function Inicio() {
 
   const [stats, setStats] = useState({
@@ -76,28 +76,50 @@ export default function Inicio() {
   return (
     <div className="dashboard-container">
 
-      <h1>Estadísticas Generales</h1>
+      <h1 className="titulo-pagina">Estadísticas Generales</h1>
 
-      {/* ESTADÍSTICAS GLOBALES */}
-      <div className="cards-container">
-        <div className="card">Usuarios: <strong>{stats.usuarios}</strong></div>
-        <div className="card">Técnicos: <strong>{stats.tecnicos}</strong></div>
-        <div className="card">En Proceso: <strong>{stats.enProceso}</strong></div>
-        <div className="card">Cerrados: <strong>{stats.cerrados}</strong></div>
-        <div className="card">Cancelados: <strong>{stats.cancelados}</strong></div>
-        <div className="card">⭐ Satisfacción: <strong>{stats.promedioSatisfaccion}</strong></div>
+      <div className="stats-grid">
+        <div className="stat-card">
+          <h4>Usuarios</h4>
+          <p>{stats.usuarios}</p>
+        </div>
+
+        <div className="stat-card">
+          <h4>Técnicos</h4>
+          <p>{stats.tecnicos}</p>
+        </div>
+
+        <div className="stat-card">
+          <h4>⭐ Satisfacción</h4>
+          <p>{stats.promedioSatisfaccion}</p>
+        </div>
+
+        <div className="stat-card">
+          <h4>En Proceso</h4>
+          <p>{stats.enProceso}</p>
+        </div>
+
+        <div className="stat-card">
+          <h4>Cerrados</h4>
+          <p>{stats.cerrados}</p>
+        </div>
+
+        <div className="stat-card">
+          <h4>Cancelados</h4>
+          <p>{stats.cancelados}</p>
+        </div>        
       </div>
 
       <hr />
 
       {/* ESTADÍSTICAS POR TÉCNICO */}
-      <h2 className="mt-4">Estadísticas por Técnico</h2>
+      <h2 className="subtitulo">Estadísticas por Técnico</h2>
       <div className="cards-container">
         {statsTecnicos.map((t) => (
-          <div className="card tech-card" key={t.id_usuario}>
+          <div className="card-theme user-card" key={t.id_usuario}>
             <h5>{t.nombre}</h5>
             <p>Tickets resueltos: <strong>{t.tickets_resueltos}</strong></p>
-            <p>⭐ Calificación: <strong>{t.calificacion_promedio ? Number(t.calificacion_promedio).toFixed(2) : "N/A"}</strong></p>
+            <p>⭐ Promedio: <strong>{t.calificacion_promedio ? Number(t.calificacion_promedio).toFixed(2) : "N/A"}</strong></p>
           </div>
         ))}
       </div>
@@ -105,10 +127,10 @@ export default function Inicio() {
       <hr />
 
       {/* ESTADÍSTICAS POR USUARIO */}
-      <h2 className="mt-4">Estadísticas por Usuario</h2>
+      <h2 className="subtitulo">Estadísticas por Usuario</h2>
       <div className="cards-container">
         {statsUsuarios.map((u) => (
-          <div className="card user-card" key={u.id_usuario}>
+          <div className="card-theme user-card" key={u.id_usuario}>
             <h5>{u.nombre}</h5>
             <p>Tickets creados: <strong>{u.tickets_creados}</strong></p>
             <p>⭐ Calificación recibida: <strong>{u.calificacion_promedio ? Number(u.calificacion_promedio).toFixed(2) : "N/A"}</strong></p>
