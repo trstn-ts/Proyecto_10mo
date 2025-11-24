@@ -35,3 +35,48 @@
   flex-direction: column;
   gap: 10px;
 }
+
+/* Agrupador de las 3 tablas */
+.usuarios-secciones {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+/* Contenedor de cada sección */
+.usuarios-section {
+  background: var(--color-surface);
+  padding: 20px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+}
+
+/* Títulos estilizados por tipo */
+.usuarios-title {
+  margin-bottom: 15px;
+  font-weight: 700;
+  font-size: var(--font-size-lg);
+}
+
+.usuarios-title.admin {
+  color: var(--color-primary-dark);
+}
+
+.usuarios-title.tecnico {
+  color: var(--color-info);
+}
+
+.usuarios-title.user {
+  color: var(--color-text-light);
+}
+
+/* Ajuste de tablas */
+.usuarios-table {
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.table thead th {
+  background-color: var(--color-primary);
+  color: white;
+}

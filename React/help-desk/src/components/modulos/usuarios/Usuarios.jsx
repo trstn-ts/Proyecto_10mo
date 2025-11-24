@@ -11,6 +11,9 @@ function Usuarios() {
   const [roles, setRoles] = useState([]);
   const [areas, setAreas] = useState([]);
 
+  const normalize = (txt) =>
+  txt?.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+
   const [mostrandoModal, setMostrandoModal] = useState(false);
   const [nuevoUsuario, setNuevoUsuario] = useState({
     nombre: "",
@@ -191,18 +194,23 @@ function Usuarios() {
   };
 
   if (cargando) return <p className="text-center mt-5">Cargando usuarios...</p>;
-  if (error) return <p className="text-danger text-center mt-5">{error}</p>;
+  if (error) return <p className="text-danger text-center mt-5">{error}</p>; 
 
   return (
-    <div className="container mt-4 usuarios-container">
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h2 className="text-dark">Lista de Usuarios</h2>
-        <button className="btn btn-danger" onClick={abrirModal}>
-          <i className="bi bi-person-plus"></i> Nuevo Usuario
-        </button>
-      </div>
+  <div className="container mt-4 usuarios-container">
 
-      <div className="table-responsive shadow-sm rounded">
+    {/* Header */}
+    <div className="d-flex justify-content-between align-items-center mb-4">
+      <h2 className="text-dark">Gestión de Usuarios</h2>
+      <button className="btn btn-danger" onClick={abrirModal}>
+        <i className="bi bi-person-plus"></i> Nuevo Usuario
+      </button>
+    </div>
+
+    {/* ADMINISTRADORES */}
+    <div className="usuarios-section mb-4">
+      <h4 className="usuarios-section-title">Administradores</h4>
+      <div className="table-responsive shadow-sm rounded usuarios-table">
         <table className="table table-hover align-middle">
           <thead className="table-danger">
             <tr>
@@ -210,151 +218,258 @@ function Usuarios() {
               <th>Nombre</th>
               <th>Correo</th>
               <th>Teléfono</th>
-              <th>Rol</th>
               <th>Área</th>
               <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
-            {usuarios.map((usuario) => (
-              <tr key={usuario.id_usuario}>
-                <td>{usuario.id_usuario}</td>
-                <td>{usuario.nombre_usuario}</td>
-                <td>{usuario.correo}</td>
-                <td>{usuario.telefono}</td>
-                <td>{usuario.nombre_rol}</td>
-                <td>{usuario.nombre_area}</td>
-                <td>
-                  <button
-                    className="btn btn-outline-danger btn-sm me-2"
-                    onClick={() => eliminarUsuario(usuario.id_usuario)}
-                  >
-                    <i className="bi bi-trash3"></i>
-                  </button>
-                  <button
-                    className="btn btn-outline-primary btn-sm"
-                    onClick={() => abrirModalEditar(usuario)}
-                  >
-                    <i className="bi bi-pencil-square"></i>
-                  </button>
-                </td>
-              </tr>
-            ))}
+            {usuarios
+              .filter((u) => normalize(u.nombre_rol) === "administrador")            
+              .map((usuario) => (
+                <tr key={usuario.id_usuario}>
+                  <td>{usuario.id_usuario}</td>
+                  <td>{usuario.nombre_usuario}</td>
+                  <td>{usuario.correo}</td>
+                  <td>{usuario.telefono}</td>
+                  <td>{usuario.nombre_area}</td>
+                  <td>
+                    <button
+                      className="btn btn-outline-danger btn-sm me-2"
+                      onClick={() => eliminarUsuario(usuario.id_usuario)}
+                    >
+                      <i className="bi bi-trash3"></i>
+                    </button>
+                    <button
+                      className="btn btn-outline-primary btn-sm"
+                      onClick={() => abrirModalEditar(usuario)}
+                    >
+                      <i className="bi bi-pencil-square"></i>
+                    </button>
+                  </td>
+                </tr>
+              ))}
           </tbody>
         </table>
       </div>
-
-      {/* Modal Crear */}
-      {mostrandoModal && (
-        <div className="custom-modal">
-          <div className="custom-modal-content">
-            <h4>Crear Nuevo Usuario</h4>
-            <form onSubmit={guardarUsuario} className="form-grid">
-              <input className="form-control" placeholder="Nombre" value={nuevoUsuario.nombre}
-                onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, nombre: e.target.value })} />
-              <input className="form-control" placeholder="Apellido" value={nuevoUsuario.apellido}
-                onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, apellido: e.target.value })} />
-              <input className="form-control" placeholder="Correo" value={nuevoUsuario.correo}
-                onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, correo: e.target.value })} />
-              <input className="form-control" placeholder="Teléfono" value={nuevoUsuario.telefono}
-                onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, telefono: e.target.value })} />
-              <input className="form-control" placeholder="Usuario" value={nuevoUsuario.usuario}
-                onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, usuario: e.target.value })} />
-              <input className="form-control" type="password" placeholder="Contraseña" value={nuevoUsuario.password}
-                onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, password: e.target.value })} />
-
-              <select className="form-select" value={nuevoUsuario.id_rol}
-                onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, id_rol: e.target.value })}>
-                <option value="">Selecciona rol</option>
-                {roles.map((r) => (
-                  <option key={r.id_rol} value={r.id_rol}>
-                    {r.nombre_rol}
-                  </option>
-                ))}
-              </select>
-
-              <select className="form-select" value={nuevoUsuario.id_area}
-                onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, id_area: e.target.value })}>
-                <option value="">Selecciona área</option>
-                {areas.map((a) => (
-                  <option key={a.id_area} value={a.id_area}>
-                    {a.nombre_area}
-                  </option>
-                ))}
-              </select>
-
-              {mensaje && <p className="text-danger text-center">{mensaje}</p>}
-
-              <div className="d-flex justify-content-end mt-2">
-                <button type="button" className="btn btn-secondary me-2" onClick={cerrarModal}>
-                  Cancelar
-                </button>
-                <button type="submit" className="btn btn-danger" disabled={guardando}>
-                  {guardando ? "Guardando..." : "Guardar"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Modal Editar */}
-      {mostrandoModalEditar && usuarioSeleccionado && (
-        <div className="custom-modal">
-          <div className="custom-modal-content">
-            <h4>Editar Usuario</h4>
-            <form onSubmit={guardarEdicion} className="form-grid">
-              <input className="form-control" placeholder="Nombre"
-                value={usuarioSeleccionado.nombre}
-                onChange={(e) => setUsuarioSeleccionado({ ...usuarioSeleccionado, nombre: e.target.value })} />
-              <input className="form-control" placeholder="Apellido"
-                value={usuarioSeleccionado.apellido}
-                onChange={(e) => setUsuarioSeleccionado({ ...usuarioSeleccionado, apellido: e.target.value })} />
-              <input className="form-control" placeholder="Correo"
-                value={usuarioSeleccionado.correo}
-                onChange={(e) => setUsuarioSeleccionado({ ...usuarioSeleccionado, correo: e.target.value })} />
-              <input className="form-control" placeholder="Teléfono"
-                value={usuarioSeleccionado.telefono}
-                onChange={(e) => setUsuarioSeleccionado({ ...usuarioSeleccionado, telefono: e.target.value })} />
-              <input className="form-control" placeholder="Usuario"
-                value={usuarioSeleccionado.usuario}
-                onChange={(e) => setUsuarioSeleccionado({ ...usuarioSeleccionado, usuario: e.target.value })} />
-              <input className="form-control" type="password" placeholder="Contraseña"
-                value={usuarioSeleccionado.password}
-                onChange={(e) => setUsuarioSeleccionado({ ...usuarioSeleccionado, password: e.target.value })} />
-
-              <select className="form-select" value={usuarioSeleccionado.id_rol}
-                onChange={(e) => setUsuarioSeleccionado({ ...usuarioSeleccionado, id_rol: e.target.value })}>
-                <option value="">Selecciona rol</option>
-                {roles.map((r) => (
-                  <option key={r.id_rol} value={r.id_rol}>
-                    {r.nombre_rol}
-                  </option>
-                ))}
-              </select>
-
-              <select className="form-select" value={usuarioSeleccionado.id_area}
-                onChange={(e) => setUsuarioSeleccionado({ ...usuarioSeleccionado, id_area: e.target.value })}>
-                <option value="">Selecciona área</option>
-                {areas.map((a) => (
-                  <option key={a.id_area} value={a.id_area}>
-                    {a.nombre_area}
-                  </option>
-                ))}
-              </select>
-
-              {mensaje && <p className="text-danger text-center">{mensaje}</p>}
-
-              <div className="d-flex justify-content-end mt-2">
-                <button type="submit" className="btn btn-danger me-2">Guardar</button>
-                <button type="button" className="btn btn-secondary" onClick={cerrarModalEditar}>Cerrar</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
-  );
+
+    {/* TÉCNICOS */}
+    <div className="usuarios-section mb-4">
+      <h4 className="usuarios-section-title">Técnicos</h4>
+      <div className="table-responsive shadow-sm rounded usuarios-table">
+        <table className="table table-hover align-middle">
+          <thead className="table-warning">
+            <tr>
+              <th>ID</th>
+              <th>Nombre</th>
+              <th>Correo</th>
+              <th>Teléfono</th>
+              <th>Área</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {usuarios
+              .filter((u) => normalize(u.nombre_rol) === "tecnico")
+              .map((usuario) => (
+                <tr key={usuario.id_usuario}>
+                  <td>{usuario.id_usuario}</td>
+                  <td>{usuario.nombre_usuario}</td>
+                  <td>{usuario.correo}</td>
+                  <td>{usuario.telefono}</td>
+                  <td>{usuario.nombre_area}</td>
+                  <td>
+                    <button
+                      className="btn btn-outline-danger btn-sm me-2"
+                      onClick={() => eliminarUsuario(usuario.id_usuario)}
+                    >
+                      <i className="bi bi-trash3"></i>
+                    </button>
+                    <button
+                      className="btn btn-outline-primary btn-sm"
+                      onClick={() => abrirModalEditar(usuario)}
+                    >
+                      <i className="bi bi-pencil-square"></i>
+                    </button>
+                  </td>
+                </tr>
+              ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    {/* USUARIOS GENERALES */}
+    <div className="usuarios-section">
+      <h4 className="usuarios-section-title">Usuarios</h4>
+      <div className="table-responsive shadow-sm rounded usuarios-table">
+        <table className="table table-hover align-middle">
+          <thead className="table-info">
+            <tr>
+              <th>ID</th>
+              <th>Nombre</th>
+              <th>Correo</th>
+              <th>Teléfono</th>
+              <th>Área</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {usuarios
+              .filter((u) => normalize(u.nombre_rol) === "usuario")              
+              .map((usuario) => (
+                <tr key={usuario.id_usuario}>
+                  <td>{usuario.id_usuario}</td>
+                  <td>{usuario.nombre_usuario}</td>
+                  <td>{usuario.correo}</td>
+                  <td>{usuario.telefono}</td>
+                  <td>{usuario.nombre_area}</td>
+                  <td>
+                    <button
+                      className="btn btn-outline-danger btn-sm me-2"
+                      onClick={() => eliminarUsuario(usuario.id_usuario)}
+                    >
+                      <i className="bi bi-trash3"></i>
+                    </button>
+                    <button
+                      className="btn btn-outline-primary btn-sm"
+                      onClick={() => abrirModalEditar(usuario)}
+                    >
+                      <i className="bi bi-pencil-square"></i>
+                    </button>
+                  </td>
+                </tr>
+              ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    {/* MODAL CREAR */}
+    {mostrandoModal && (
+      <div className="custom-modal">
+        <div className="custom-modal-content">
+          <h4>Crear Nuevo Usuario</h4>
+          <form onSubmit={guardarUsuario} className="form-grid">
+            <input className="form-control" placeholder="Nombre"
+              value={nuevoUsuario.nombre}
+              onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, nombre: e.target.value })} />
+
+            <input className="form-control" placeholder="Apellido"
+              value={nuevoUsuario.apellido}
+              onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, apellido: e.target.value })} />
+
+            <input className="form-control" placeholder="Correo"
+              value={nuevoUsuario.correo}
+              onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, correo: e.target.value })} />
+
+            <input className="form-control" placeholder="Teléfono"
+              value={nuevoUsuario.telefono}
+              onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, telefono: e.target.value })} />
+
+            <input className="form-control" placeholder="Usuario"
+              value={nuevoUsuario.usuario}
+              onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, usuario: e.target.value })} />
+
+            <input className="form-control" type="password" placeholder="Contraseña"
+              value={nuevoUsuario.password}
+              onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, password: e.target.value })} />
+
+            <select className="form-select" value={nuevoUsuario.id_rol}
+              onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, id_rol: e.target.value })}>
+              <option value="">Selecciona rol</option>
+              {roles.map((r) => (
+                <option key={r.id_rol} value={r.id_rol}>{r.nombre_rol}</option>
+              ))}
+            </select>
+
+            <select className="form-select" value={nuevoUsuario.id_area}
+              onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, id_area: e.target.value })}>
+              <option value="">Selecciona área</option>
+              {areas.map((a) => (
+                <option key={a.id_area} value={a.id_area}>{a.nombre_area}</option>
+              ))}
+            </select>
+
+            {mensaje && <p className="text-danger text-center">{mensaje}</p>}
+
+            <div className="d-flex justify-content-end mt-2">
+              <button type="button" className="btn btn-secondary me-2" onClick={cerrarModal}>
+                Cancelar
+              </button>
+              <button type="submit" className="btn btn-danger" disabled={guardando}>
+                {guardando ? "Guardando..." : "Guardar"}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    )}
+
+    {/* MODAL EDITAR */}
+    {mostrandoModalEditar && usuarioSeleccionado && (
+      <div className="custom-modal">
+        <div className="custom-modal-content">
+          <h4>Editar Usuario</h4>
+
+          <form onSubmit={guardarEdicion} className="form-grid">
+            <input className="form-control" placeholder="Nombre"
+              value={usuarioSeleccionado.nombre}
+              onChange={(e) => setUsuarioSeleccionado({ ...usuarioSeleccionado, nombre: e.target.value })} />
+
+            <input className="form-control" placeholder="Apellido"
+              value={usuarioSeleccionado.apellido}
+              onChange={(e) => setUsuarioSeleccionado({ ...usuarioSeleccionado, apellido: e.target.value })} />
+
+            <input className="form-control" placeholder="Correo"
+              value={usuarioSeleccionado.correo}
+              onChange={(e) => setUsuarioSeleccionado({ ...usuarioSeleccionado, correo: e.target.value })} />
+
+            <input className="form-control" placeholder="Teléfono"
+              value={usuarioSeleccionado.telefono}
+              onChange={(e) => setUsuarioSeleccionado({ ...usuarioSeleccionado, telefono: e.target.value })} />
+
+            <input className="form-control" placeholder="Usuario"
+              value={usuarioSeleccionado.usuario}
+              onChange={(e) => setUsuarioSeleccionado({ ...usuarioSeleccionado, usuario: e.target.value })} />
+
+            <input className="form-control" type="password" placeholder="Contraseña"
+              value={usuarioSeleccionado.password}
+              onChange={(e) => setUsuarioSeleccionado({ ...usuarioSeleccionado, password: e.target.value })} />
+
+            <select className="form-select" value={usuarioSeleccionado.id_rol}
+              onChange={(e) => setUsuarioSeleccionado({ ...usuarioSeleccionado, id_rol: e.target.value })}>
+              <option value="">Selecciona rol</option>
+              {roles.map((r) => (
+                <option key={r.id_rol} value={r.id_rol}>{r.nombre_rol}</option>
+              ))}
+            </select>
+
+            <select className="form-select" value={usuarioSeleccionado.id_area}
+              onChange={(e) => setUsuarioSeleccionado({ ...usuarioSeleccionado, id_area: e.target.value })}>
+              <option value="">Selecciona área</option>
+              {areas.map((a) => (
+                <option key={a.id_area} value={a.id_area}>{a.nombre_area}</option>
+              ))}
+            </select>
+
+            {mensaje && <p className="text-danger text-center">{mensaje}</p>}
+
+            <div className="d-flex justify-content-end mt-2">
+              <button type="submit" className="btn btn-danger me-2">Guardar</button>
+              <button type="button" className="btn btn-secondary" onClick={cerrarModalEditar}>
+                Cerrar
+              </button>
+            </div>
+          </form>
+
+        </div>
+      </div>
+    )}
+
+  </div>
+);
+
 }
 
 export default Usuarios;
