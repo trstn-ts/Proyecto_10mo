@@ -84,7 +84,7 @@ function Roles() {
                     className="btn btn-outline-primary btn-sm"
                     onClick={() => verUsuarios(rol)}
                   >
-                    <i className="bi bi-people"></i> Ver usuarios
+                    <i className="bi bi-people"></i> Usuarios
                   </button>
                 </td>
               </tr>

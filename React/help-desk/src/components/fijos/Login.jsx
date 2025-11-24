@@ -1,15 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Login.css"; 
 import logo from "../../assets/logo.png";
-
-
 
 function Login({ setAutenticado }) {
   const [usuario, setUsuario] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+
+  useEffect(() => {    
+    localStorage.removeItem("autenticado");
+    localStorage.removeItem("usuario");
+    setAutenticado(false);
+  }, []);
 
   const manejarSubmit = async (e) => {
     e.preventDefault();

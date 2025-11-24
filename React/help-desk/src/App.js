@@ -23,13 +23,21 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Ruta de login */}
-        <Route path="/login" element={<Login setAutenticado={setAutenticado} />} />
+
+        {/* Login */}
+        <Route
+          path="/login"
+          element={<Login setAutenticado={setAutenticado} />}
+        />
 
         {/* Rutas protegidas */}
         <Route
           path="/"
-          element={autenticado ? <Layout setAutenticado={setAutenticado} /> : <Navigate to="/login" />}
+          element={
+            autenticado
+              ? <Layout setAutenticado={setAutenticado} />
+              : <Navigate to="/login" replace />
+          }
         >
           <Route path="inicio" element={<Inicio />} />
           <Route path="usuarios" element={<Usuarios />} />
@@ -40,6 +48,9 @@ function App() {
           <Route path="roles" element={<Roles />} />
           <Route path="areas" element={<Areas />} />
         </Route>
+
+        {/* Fallback */}
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>
   );

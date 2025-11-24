@@ -102,10 +102,40 @@ function Usuarios() {
 
   const guardarUsuario = async (e) => {
     e.preventDefault();
-    const { nombre, apellido, correo, usuario, password, id_rol } = nuevoUsuario;
+    const { nombre, apellido, correo, telefono, usuario, password, id_rol } = nuevoUsuario;
 
     if (!nombre || !apellido || !correo || !usuario || !password || !id_rol) {
       setMensaje("Faltan campos obligatorios");
+      return;
+    }
+
+    if (!soloLetras(nombre)) {
+    setMensaje("El nombre solo puede contener letras y espacios");
+    return;
+    }
+
+    if (!soloLetras(apellido)) {
+      setMensaje("El apellido solo puede contener letras y espacios");
+      return;
+    }
+
+    if (!esCorreoValido(correo)) {
+      setMensaje("Correo inválido");
+      return;
+    }
+
+    if (!esTelefonoValido(telefono)) {
+      setMensaje("El teléfono debe ser numérico de 10 dígitos");
+      return;
+    }
+
+    if (!esUsuarioValido(usuario)) {
+      setMensaje("El usuario debe tener mínimo 6 caracteres y no contener caracteres especiales");
+      return;
+    }
+
+    if (!esUsuarioValido(password)) {
+      setMensaje("La contraseña debe tener mínimo 6 caracteres y no contener caracteres especiales");
       return;
     }
 
@@ -144,6 +174,36 @@ function Usuarios() {
 
     if (!nombre || !apellido || !correo || !usuario || !id_rol) {
       setMensaje("Faltan campos obligatorios");
+      return;
+    }
+
+    if (!soloLetras(nombre)) {
+      setMensaje("El nombre solo puede contener letras y espacios");
+      return;
+    }
+
+    if (!soloLetras(apellido)) {
+      setMensaje("El apellido solo puede contener letras y espacios");
+      return;
+    }
+
+    if (!esCorreoValido(correo)) {
+      setMensaje("Correo inválido");
+      return;
+    }
+
+    if (!esTelefonoValido(telefono)) {
+      setMensaje("El teléfono debe ser numérico de 10 dígitos");
+      return;
+    }
+
+    if (!esUsuarioValido(usuario)) {
+      setMensaje("El usuario debe tener mínimo 6 caracteres y no contener caracteres especiales");
+      return;
+    }
+  
+    if (password && !esUsuarioValido(password)) {
+      setMensaje("La contraseña debe tener mínimo 6 caracteres y no contener caracteres especiales");
       return;
     }
 
@@ -196,14 +256,31 @@ function Usuarios() {
   if (cargando) return <p className="text-center mt-5">Cargando usuarios...</p>;
   if (error) return <p className="text-danger text-center mt-5">{error}</p>; 
 
+
+  const soloLetras = (txt) =>
+    /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(txt);
+  
+  const soloNumeros = (txt) =>
+    /^[0-9]+$/.test(txt);
+
+  const esCorreoValido = (correo) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo);
+
+  const esTelefonoValido = (tel) =>
+    /^[0-9]{10}$/.test(tel);
+
+  const esUsuarioValido = (txt) =>
+    /^[a-zA-Z0-9]{6,}$/.test(txt);
+
+
   return (
   <div className="container mt-4 usuarios-container">
 
     {/* Header */}
     <div className="d-flex justify-content-between align-items-center mb-4">
       <h2 className="text-dark">Gestión de Usuarios</h2>
-      <button className="btn btn-danger" onClick={abrirModal}>
-        <i className="bi bi-person-plus"></i> Nuevo Usuario
+      <button className="btn btn-primary" onClick={abrirModal}>
+        <i className="bi bi-plus-circle"></i> Nuevo Usuario
       </button>
     </div>
 
