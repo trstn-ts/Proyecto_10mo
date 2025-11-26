@@ -8,12 +8,16 @@
 </ion-header>
 
 <ion-content class="perfil-container">
+
+  <!-- Cargando usuario -->
   <div *ngIf="!usuario" class="ion-text-center ion-padding">
     <ion-spinner name="crescent"></ion-spinner>
     <p>Cargando datos...</p>
   </div>
 
+  <!-- Perfil -->
   <div *ngIf="usuario" class="perfil-card">
+    
     <div class="avatar-container">
       <ion-avatar class="perfil-avatar">
         <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" />
@@ -22,27 +26,59 @@
       <p class="rol">{{ usuario.rol || 'Empleado' }}</p>
     </div>
 
+    <!-- CARD DE INFORMACIÓN Y EDICIÓN -->
     <ion-card class="info-card">
       <ion-card-content>
-        <ion-item lines="none">
+
+        <!-- Nombre -->
+        <ion-item>
           <ion-icon name="person-outline" slot="start" color="danger"></ion-icon>
-          <ion-label><strong>Nombre:</strong> {{ usuario.nombre }}</ion-label>
+          <ion-label position="floating"><strong>Nombre</strong></ion-label>
+          <ion-input [(ngModel)]="usuario.nombre"></ion-input>
         </ion-item>
 
-        <ion-item lines="none">
+        <!-- Correo -->
+        <ion-item>
           <ion-icon name="mail-outline" slot="start" color="danger"></ion-icon>
-          <ion-label><strong>Correo:</strong> {{ usuario.correo }}</ion-label>
+          <ion-label position="floating"><strong>Correo</strong></ion-label>
+          <ion-input [(ngModel)]="usuario.correo"></ion-input>
         </ion-item>
 
-        <ion-item lines="none">
+        <!-- Usuario -->
+        <ion-item>
           <ion-icon name="business-outline" slot="start" color="danger"></ion-icon>
-          <ion-label><strong>Área:</strong> {{ usuario.area }}</ion-label>
+          <ion-label position="floating"><strong>Usuario</strong></ion-label>
+          <ion-input [(ngModel)]="usuario.usuario"></ion-input>
         </ion-item>
 
-        <ion-item lines="none">
-          <ion-icon name="id-card-outline" slot="start" color="danger"></ion-icon>
-          <ion-label><strong>ID Usuario:</strong> {{ usuario.id }}</ion-label>
+        <br>
+
+        <!-- SECCIÓN CAMBIO DE CONTRASEÑA -->
+        <h3 class="ion-text-center">Cambiar Contraseña</h3>
+
+        <ion-item>
+          <ion-icon name="lock-closed-outline" slot="start" color="danger"></ion-icon>
+          <ion-label position="floating">Contraseña actual</ion-label>
+          <ion-input type="password" [(ngModel)]="contrasenaActual"></ion-input>
         </ion-item>
+
+        <ion-item>
+          <ion-icon name="key-outline" slot="start" color="danger"></ion-icon>
+          <ion-label position="floating">Nueva contraseña</ion-label>
+          <ion-input type="password" [(ngModel)]="nuevaContrasena"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-icon name="key-outline" slot="start" color="danger"></ion-icon>
+          <ion-label position="floating">Confirmar contraseña</ion-label>
+          <ion-input type="password" [(ngModel)]="confirmarContrasena"></ion-input>
+        </ion-item>
+
+        <ion-button expand="block" color="primary" class="ion-margin-top" (click)="guardarCambios()">
+          <ion-icon name="save-outline" slot="start"></ion-icon>
+          Guardar Cambios
+        </ion-button>
+
       </ion-card-content>
     </ion-card>
 
@@ -50,5 +86,7 @@
       <ion-icon name="log-out-outline" slot="start"></ion-icon>
       Cerrar Sesión
     </ion-button>
+
   </div>
+
 </ion-content>
