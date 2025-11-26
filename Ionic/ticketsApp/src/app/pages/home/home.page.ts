@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { IonicModule, NavController, MenuController } from '@ionic/angular';
+import { IonicModule, NavController, MenuController, AlertController } from '@ionic/angular';
 import { CommonModule, DatePipe } from '@angular/common';
 import axios from 'axios';
 import { AuthService } from '../../services/auth';
@@ -16,21 +16,20 @@ export class HomePage implements OnInit {
   ultimoTicket: any = null;
   loading = true;
   error: string | null = null;
+  rol: number = 0; // <-- agregado para controlar botones
 
   constructor(
     private navCtrl: NavController,
     private menuCtrl: MenuController,
     public authService: AuthService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private alertCtrl: AlertController
   ) {}
 
   async ngOnInit() {
     this.authService.cargarUsuario();
-
     console.log('Rol detectado:', this.authService.getRol());
-
     await this.cargarTickets();
-
     this.cdr.detectChanges();
   }
 
@@ -43,32 +42,47 @@ export class HomePage implements OnInit {
     this.loading = true;
     this.error = null;
 
-    const idUsuarioStr = localStorage.getItem('idUsuario');
-    const idUsuario = idUsuarioStr ? parseInt(idUsuarioStr, 10) : null;
+    this.authService.cargarUsuario();
+    const user = this.authService.getUsuario();
 
-    if (!idUsuario) {
-      this.error = 'Error: No hay un usuario logueado. Redirigiendo a Login.';
-      this.loading = false;
-      setTimeout(() => this.navCtrl.navigateRoot('/login'), 2000);
+    if (!user) {
+      this.error = 'No hay un usuario logueado';
       return;
     }
 
-    try {
-      const response = await axios.get(
-        `http://localhost:3000/movil/tickets/usuario/${idUsuario}`
-      );
+    const idUsuario = user.id;
+    const rolTexto = this.authService.getRol();
 
+    if (rolTexto === 'usuario') this.rol = 3;
+    else if (rolTexto === 'tecnico') this.rol = 2;
+    else if (rolTexto === 'admin') this.rol = 1;
+
+    console.log('ROL TEXTO:', rolTexto, 'ROL NUMÉRICO:', this.rol);
+
+    let url = '';
+    if (this.rol === 3) {
+      url = `http://localhost:3000/api/tickets/usuario/${idUsuario}`;
+    } else if (this.rol === 2 || this.rol === 1) {
+      url = `http://localhost:3000/api/tickets/tecnico/${idUsuario}`;
+    } else if (this.rol === 1) { // administrador
+      url = `http://localhost:3000/api/tickets/admin`;
+    }
+
+
+    try {
+      const response = await axios.get(url);
       this.tickets = response.data;
+
       if (this.tickets.length > 0) {
         this.ultimoTicket = this.tickets[0];
       }
+
+      console.log('Tickets recibidos:', this.tickets);
     } catch (err) {
       console.error('Error cargando tickets:', err);
-      this.error =
-        'Error al cargar los tickets. Verifica que el backend esté funcionando.';
+      this.error = 'Error al cargar los tickets';
     } finally {
       this.loading = false;
-      this.cdr.detectChanges();
     }
   }
 
@@ -91,5 +105,38 @@ export class HomePage implements OnInit {
   cerrarSesion() {
     this.authService.cerrarSesion();
     this.navCtrl.navigateRoot('/');
+  }
+
+  // =============================
+  // CERRAR TICKET
+  // =============================
+  async confirmarCerrarTicket(idTicket: number) {
+    const alert = await this.alertCtrl.create({
+      header: 'Confirmación',
+      message: '¿Está seguro que desea cerrar este ticket?',
+      buttons: [
+        {
+          text: 'No',
+          role: 'cancel',
+        },
+        {
+          text: 'Sí',
+          handler: async () => {
+            await this.cerrarTicket(idTicket);
+          },
+        },
+      ],
+    });
+
+    await alert.present();
+  }
+
+  async cerrarTicket(idTicket: number) {
+    try {
+      await axios.put(`http://localhost:3000/api/tickets/cerrar/${idTicket}`);
+      await this.cargarTickets(); // recargar lista
+    } catch (err) {
+      console.error('Error cerrando ticket:', err);
+    }
   }
 }
