@@ -109,27 +109,41 @@
     <h3 class="section-title">Últimos Tickets</h3>
 
     <div class="ticket-list" *ngIf="tickets.length > 0">
-      <ion-card *ngFor="let ticket of tickets">
-        <ion-card-content>
-          <ion-label>
-            <h2>{{ ticket.titulo }}</h2>
-            <p>{{ ticket.descripcion }}</p>
-            <small>
-              Estado:
-              <span
-                [class]="{
-                  'ion-text-success': ticket.estado === 'Cerrado',
-                  'ion-text-warning': ticket.estado === 'En proceso'
-                }"
-              >
-                {{ ticket.estado }}
-              </span>
-              | Prioridad: {{ ticket.prioridad }} | Fecha:
-              {{ ticket.fecha_creacion | date: 'short' }}
-            </small>
-          </ion-label>
-        </ion-card-content>
-      </ion-card>
+<ion-card *ngFor="let ticket of tickets">
+  <ion-card-content>
+    <h2>{{ ticket.titulo }}</h2>
+    <p>{{ ticket.descripcion }}</p>
+
+    <small>
+      Solicitante: <strong>{{ ticket.usuario_solicitante }}</strong><br>
+      Estado:
+      <span
+        [class]="{
+          'ion-text-success': ticket.estado === 'Cerrado',
+          'ion-text-warning': ticket.estado === 'En proceso',
+          'ion-text-danger': ticket.estado === 'Cancelado'
+        }"
+      >
+        {{ ticket.estado }}
+      </span>
+      | Prioridad: {{ ticket.prioridad }} | Fecha:
+      {{ ticket.fecha_creacion | date: 'short' }}
+    </small>
+
+    <!-- BOTÓN SOLO PARA ROL 1 Y 2 Y SI EL TICKET ESTÁ EN PROCESO -->
+    <ion-button
+      *ngIf="ticket.estado === 'En proceso' && (rol === 1 || rol === 2)"
+      color="danger"
+      expand="block"
+      (click)="confirmarCerrarTicket(ticket.id)"
+    >
+      Cerrar Ticket
+    </ion-button>
+  </ion-card-content>
+</ion-card>
+
+
+
     </div>
 
     <div
